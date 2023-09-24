@@ -1,0 +1,21 @@
+{{#if products.empty}}
+{{products.empty}} <br>
+{{else}}
+
+{{#each products}}
+<div>
+    x{{this.quantity}} {{this.title}} <br>
+    ${{this.price}} each <br>
+    <br>
+</div>
+{{/each}}
+
+Total amount: {{result}}$ ||  <button onclick="goToPurchase()">Finish order</button> <br>
+
+{{/if}}
+
+
+
+<a href="/products">Go back</a> <br>
+
+<script src="/js/views.js"></script>

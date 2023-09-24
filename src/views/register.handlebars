@@ -1,0 +1,13 @@
+<h1>Sign up</h1>
+<a href="/api/sessions/github">Sign in using github</a> <br>
+<!-- <a href="/api/sessions/facebook">Sign in using facebook</a><br>
+<a href="/api/sessions/google">Sign in using google</a><br> -->
+<form action="/auth/register" method="POST">
+    <input type="text" name="first_name" placeholder="First name"> <br>
+    <input type="text" name="last_name" placeholder="Last name"><br>
+    <input type="text" name="email" placeholder="Email"><br>
+    <input type="number" name="age" placeholder="Age"><br>
+    <input type="password" name="password" placeholder="Password"><br>
+    <button onclick="summit">Register me!</button>
+</form>
+<a href="/auth/login">Already have an account!</a> <br>

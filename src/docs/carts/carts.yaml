@@ -1,0 +1,151 @@
+paths:
+  /carts/{cid}:
+    get:
+      summary: Retorno el contendido de el carro que solicité por parametros (unicamente de el usuario en session)
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID de tu carro
+          schema:
+            $type: String
+      responses:
+        "200":
+          description: Informacion sobre el contendido de tu carro
+          content:
+            aplication/json:
+              schema:
+                $ref: "#components/schemas/cart"
+
+  /carts/products/{pid}:
+    post:
+      summary: Agrego un producto a mi carro
+      tags:
+        - Carts
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID de el producto a agregar
+          schema:
+            $type: String
+      responses:
+        "200":
+          description: Informacion sobre el producto agregado
+          content:
+            aplication/json:
+              schema:
+                $ref: "#components/schemas/addProduct"
+  /carts/{cid}/purchase:
+    get:
+      summary: Muestra el valor y los productos totales de la compra antes de genrar el ticket
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID de tu carro
+          schema:
+            $type: String
+      responses:
+        "200":
+          description: Informacion sobre el contendido de tu carro
+          content:
+            aplication/json:
+              schema:
+                $ref: "#components/schemas/showPurchase"
+    post:
+      summary: Genero el ticket de compra y paso al checkout
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID de tu carro
+          schema:
+            $type: String
+      responses:
+        "200":
+          description: Ticket de compra
+          content:
+            aplication/json:
+              schema:
+                $ref: "#components/schemas/postPurchase"
+
+components:
+  schemas:
+    cart:
+      type: object
+      properties:
+        product:
+          type: ObjectId
+          description: ID referencia de objeto de mongo
+        quantity:
+          type: Number
+          description: Cantidad de unidades de dicho producto en el carro
+      example:
+        product: ObjectId("644081a93f0625dc193bc594")
+        quantity: 5
+    addProduct:
+      type: object
+      properties:
+        _id: ObjectId
+        description: ID referencia de objeto de mongo
+        cart:
+          product: ObjectId
+          quantity: Number
+          description: ID referencia de producto de mongo, y cantidad de unidades de el producto en carro.
+      example:
+        _id: new ObjectId("64f8c91c7d1c13bc30524398")
+        cart:
+          product:
+            title: example
+            description: example
+            price: example
+            stock: example
+          quantity: 1
+    showPurchase:
+      type: object
+      properties:
+        cartId:
+          type: String
+          description: User Cart ID
+        products:
+          type: Array
+          description: Todos los productos que esten en el carro de el usuario
+        result:
+          type: Number
+          description: Monto total a pagar
+      example:
+        cartId: 64f8c91c7d1c13bc30524398
+        products: [64cea833eefde7c118f5ba2a, 64cea86beefde7c118f5ba2e]
+        result: 25000
+    postPurchase:
+      type: object
+      properties:
+        code:
+          type: Number
+          description: Codigo de la orden generada
+        purchase_datetime:
+          type: Date
+          description: Hora que se efectuo la compra
+        amount:
+          type: Number
+          description: Monto pagado
+        purchaser:
+          type: String
+          description: Email de la persona que realizó la compra
+        _id:
+          type: ObjectId
+          description: Id de el ticket
+      example:
+        code: 33721779
+        purchase_datetime: "2023-09-06T22:44:52.067Z"
+        amount: 4000
+        purchaser: anything@anything.com
+        _id: new ObjectId("64f900e5f7af918f963156d9")
+

@@ -1,0 +1,10 @@
+Current role: {{role}}
+<form method="POST" action="/api/users/premium/{{_id}}">
+    <label for="role">Select a Role:</label>
+    <select name="role" id="role">
+        <option value="USER">USER</option>
+        <option value="PREMIUM">PREMIUM</option>
+    </select>
+    <input type="hidden" name="id" value="{{_id}}">
+    <button type="submit">Submit</button>
+</form>

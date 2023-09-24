@@ -1,0 +1,14 @@
+<h1>Upload Pictures and Documents</h1>
+<form action="/api/users/{{user}}/documents" method="POST" enctype="multipart/form-data">
+    <h2>Products</h2>
+    <input type="file" name="products" multiple>
+
+    <h2>Profiles</h2>
+    <input type="file" name="profiles" multiple>
+
+    <h2>Documents</h2>
+    <input type="file" name="documents" multiple>
+
+
+    <input type="submit" value="Upload">
+</form>

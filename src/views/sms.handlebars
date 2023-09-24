@@ -1,0 +1,15 @@
+Send us an SMS:
+
+<form action="/sms" method="POST" onsubmit="return showConfirmation()">
+    <textarea rows="5" cols="60" name="smsBody" placeholder="Send us a sms..."></textarea><br>
+    <button onclick="summit">SEND</button>
+</form>
+
+<script>
+    function showConfirmation() {
+        alert('Thanks for using our sms service...');
+        return true;
+    }
+</script>
+
+<a href="/products">Back to the shop</a><br>

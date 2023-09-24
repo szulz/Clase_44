@@ -1,0 +1,179 @@
+paths:
+  /products:
+    get:
+      summary: Retorno todos los productos y la paginacion
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Informacion sobre el contendido de tu carro
+          content:
+            aplication/json:
+              schema:
+                $ref: "#components/schemas/getProducts"
+
+    post:
+      summary: Creo un nuevo producto (solo para admins)
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/createProduct"
+      responses:
+        "200":
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/productExample"
+
+  /products/stock/{pid}:
+    get:
+      summary: Devuelvo la cantidad de stock de el producto solicitado
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID de tu carro
+          schema:
+            $type: String
+      responses:
+        "200":
+          description: Informacion de el stock
+          content:
+            aplication/json:
+              schema:
+                $ref: "#components/schemas/getStock"
+
+components:
+  schemas:
+    getProducts:
+      type: Array
+      properties:
+        products:
+          type: Array
+          description: Productos cargados
+        getAll:
+          type: object
+          description: Para armar los links de prevPage y nextPage
+        cartId:
+          type: String
+          description: Id de el carro del usuario
+        PORT:
+          type: Number
+          description: Puerto actual utilizado
+      example:
+        products:
+          [
+            {
+              {
+                title: "Buzo kuromi",
+                description: "Polar",
+                price: 6000,
+                stock: 0,
+                _id: '"64cea855eefde7c118f5ba2c"',
+              },
+              {
+                title: "Remera de HK",
+                description: "Hello Kitty",
+                price: 4000,
+                stock: 9,
+                _id: '"64cea833eefde7c118f5ba2a"',
+              },
+              {
+                title: "Pantalo HK",
+                description: "Polar",
+                price: 7500,
+                stock: 10,
+                _id: '"64cea86beefde7c118f5ba2e"',
+              },
+            },
+          ]
+        getAll:
+          [
+            {
+              {
+                status: "success",
+                payload:
+                  [
+                    {
+                      _id: new ObjectId("64cea855eefde7c118f5ba2c"),
+                      title: "Buzo kuromi",
+                      description: "Polar",
+                      price: 6000,
+                      stock: 0,
+                      __v: 0,
+                    },
+                    {
+                      _id: new ObjectId("64cea833eefde7c118f5ba2a"),
+                      title: "Remera de HK",
+                      description: "Hello Kitty",
+                      price: 4000,
+                      stock: 9,
+                      __v: 0,
+                    },
+                    {
+                      _id: new ObjectId("64cea86beefde7c118f5ba2e"),
+                      title: "Pantalo HK",
+                      description: "Polar",
+                      price: 7500,
+                      stock: 10,
+                      __v: 0,
+                    },
+                  ],
+                totalPages: 2,
+                prevPage: null,
+                nextPage: 2,
+                page: 1,
+                hasPrevPage: false,
+                hasNextPage: true,
+                prevLink: null,
+                nextLink: "http://localhost:8080/products?page=2",
+              },
+            },
+          ]
+        cartId: 64f8c91c7d1c13bc30524398
+        PORT: 8080
+    getStock:
+      type: Number
+      properties:
+        stock:
+          type: Number
+          description: Cantidad de productos disponibles
+      example:
+        stock: 20
+    productExample:
+      type: object
+      example:
+        title: example
+        description: example
+        price: 999
+        stock: 999
+        _id: new ObjectId("64f910bf7248127fb5a798af")
+
+  requestBodies:
+    createProduct:
+      type: object
+      properties:
+        title:
+          type: String
+          description:
+        description:
+          type: String
+          description:
+        price:
+          type: Number
+          description:
+        stock:
+          type: Number
+          description:
+      example:
+        title: example
+        description: example
+        price: 999
+        stock: 999
