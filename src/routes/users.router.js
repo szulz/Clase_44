@@ -1,7 +1,8 @@
 const express = require('express');
 const userModel = require('../model/schemas/users.model');
 const userRouter = express.Router()
-const uploader = require('../middlewares/multer.js')
+const uploader = require('../middlewares/multer.js');
+const products_uploader = require('../middlewares/multer_products');
 
 userRouter.get('/premium/:uid', async (req, res) => {
     let user = await userModel.findById(req.params.uid)
@@ -24,12 +25,18 @@ userRouter.get('/:uid/documents', async (req, res) => {
 })
 
 
-userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount: 5 }, { name: 'products', maxCount: 5 }, { name: 'documents', maxCount: 5 }]), (req, res) => {
+userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount: 5 }, { name: 'products', maxCount: 5 }, { name: 'account', maxCount: 5 }, { name: 'adress', maxCount: 5 }, { name: 'info', maxCount: 5 }]), async (req, res) => {
+    let account = req.files.account
+    let adress = req.files.adress
+    let info = req.files.info
     let products = req.files.products
     let profiles = req.files.profiles
     let documents = req.files.documents
-    let user = req.params.uid
-    res.render('documents_post', { products, profiles, documents, user })
+    //SOLO FUNCIONA CUANDO LOS 3 ARCHIVOS SE MANDAN
+    let user = await userModel.findByIdAndUpdate(req.params.uid,
+        { documents: { name: account[0].fieldname + '/' + adress[0].fieldname + '/' + info[0].fieldname, reference: account[0].filename + '/' + adress[0].filename + '/' + info[0].filename } }, { new: true })
+    console.log(user);
+    res.render('documents_post', { products, profiles, /*user,*/ account, adress, info })
 })
 
 

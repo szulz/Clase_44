@@ -70,7 +70,7 @@ describe('API testing / E-commerce', () => {
             expect(status).to.be.eql(200)
         }).timeout(50000);
         it('TEST 2 - Show cart content', async () => {
-            let response = await requester.get(`/carts/${user_in_session.cart}`).set('Cookie', [`${cookie.name}=${cookie.value}`]);
+            let { status } = await requester.get(`/carts/${user_in_session.cart}`).set('Cookie', [`${cookie.name}=${cookie.value}`]);
             expect(status).to.be.eql(200)
         }).timeout(50000)
         it('TEST 3 - Delete or decrease one product in user´s cart', async () => {
