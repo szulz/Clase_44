@@ -15,27 +15,6 @@ const storage = multer.diskStorage({
     },
 })
 
-/*const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        if (file.fieldname === 'account') {
-            cb(null, path.join(__dirname, '..', `/public/documents/account`))
-        } else {
-            if (file.fieldname === 'adress') {
-                cb(null, path.join(__dirname, '..', `/public/documents/adress`))
-            } else {
-                if (file.fieldname === 'info') {
-                    cb(null, path.join(__dirname, '..', `/public/documents/info`))
-                } else {
-                    cb(null, path.join(__dirname, '..', `/public/${file.fieldname}`))
-                }
-            }
-        }
-
-    },
-    filename: function (req, file, cb) {
-        cb(null, req.params.uid + '_' + Date.now() + '-' + file.originalname);
-    },
-});*/
 
 const uploader = multer({ storage })
 

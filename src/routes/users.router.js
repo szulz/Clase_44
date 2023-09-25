@@ -3,6 +3,8 @@ const userModel = require('../model/schemas/users.model');
 const userRouter = express.Router()
 const uploader = require('../middlewares/multer.js');
 const products_uploader = require('../middlewares/multer_products');
+const DocumentDTO = require('../model/DTO/documents.dto');
+const fs = require('fs')
 
 userRouter.get('/premium/:uid', async (req, res) => {
     let user = await userModel.findById(req.params.uid)
@@ -20,8 +22,18 @@ userRouter.post('/premium/:uid', async (req, res) => {
 })
 
 userRouter.get('/:uid/documents', async (req, res) => {
-    let user = req.params.uid
-    return res.render('documents_get', { user })
+    try {
+        let user = req.params.uid
+        let foundUser = await userModel.findById(req.params.uid)
+        /*
+        if (foundUser.role === 'PREMIUM') {
+            return res.send({ message: 'You are already a premium user, dont need to upload documents' })
+        }
+        */
+        return res.render('documents_get', { user })
+    } catch {
+        res.send({ message: 'try with another uid!' })
+    }
 })
 
 
@@ -32,13 +44,59 @@ userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount
     let products = req.files.products
     let profiles = req.files.profiles
     let documents = req.files.documents
-    //SOLO FUNCIONA CUANDO LOS 3 ARCHIVOS SE MANDAN
-    let user = await userModel.findByIdAndUpdate(req.params.uid,
-        { documents: { name: account[0].fieldname + '/' + adress[0].fieldname + '/' + info[0].fieldname, reference: account[0].filename + '/' + adress[0].filename + '/' + info[0].filename } }, { new: true })
-    console.log(user);
-    res.render('documents_post', { products, profiles, /*user,*/ account, adress, info })
+    if (account == undefined || adress == undefined || info == undefined) {
+        await userModel.findByIdAndUpdate(req.params.uid, { documents: [] }, { new: true })
+        if (account != undefined) {
+            let filePath = account[0].path
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error(`Error deleting file: ${err}`);
+                } else {
+                    console.log('File deleted successfully.');
+                }
+            });
+        }
+        if (adress != undefined) {
+            let filePath = adress[0].path
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error(`Error deleting file: ${err}`);
+                } else {
+                    console.log('File deleted successfully.');
+                }
+            });
+        }
+        if (info != undefined) {
+            let filePath = filePath[0].path
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error(`Error deleting file: ${err}`);
+                } else {
+                    console.log('File deleted successfully.');
+                }
+            });
+        }
+        return res.send({ message: 'You must upload all 3 files to sucessfully update your status' })
+    }
+    let user = await userModel.findByIdAndUpdate(req.params.uid, {
+        documents:
+            [
+                { name: account[0].fieldname, reference: account[0].filename },
+                { name: adress[0].fieldname, reference: adress[0].filename },
+                { name: info[0].fieldname, reference: info[0].filename },
+            ],
+        role: 'PREMIUM'
+    }, { new: true })
+    //let cleanUser = new DocumentDTO(user)
+    res.render('documents_post', { products, profiles, account, adress, info, user })
+
 })
 
+/*
+   let user = await userModel.findByIdAndUpdate(req.params.uid,
+        { documents: { name: account[0].fieldname + '/' + adress[0].fieldname + '/' + info[0].fieldname, reference: account[0].filename + '/' + adress[0].filename + '/' + info[0].filename } }, { new: true })
+    console.log(user);
+*/
 
 
 module.exports = userRouter
