@@ -4,21 +4,56 @@ const userRouter = express.Router()
 const uploader = require('../middlewares/multer.js');
 const products_uploader = require('../middlewares/multer_products');
 const DocumentDTO = require('../model/DTO/documents.dto');
-const fs = require('fs')
+const fs = require('fs');
+const path = require('path');
 
 userRouter.get('/premium/:uid', async (req, res) => {
-    let user = await userModel.findById(req.params.uid)
-    res.render('userRoleChanger', user)
+    try {
+        let user = await userModel.findById(req.params.uid)
+        res.render('userRoleChanger', user)
+    } catch {
+        res.send({ message: 'try with another uid' })
+    }
 })
 
 userRouter.post('/premium/:uid', async (req, res) => {
     let newRole = req.body.role
     if (newRole !== 'USER' && newRole !== 'PREMIUM') {
         req.logger.warn('NOT ALLOW TO CHANGE THE VALUES')
-        return res.render('welcome')
+        return res.render('login')
     }
-    let usercatualizado = await userModel.findByIdAndUpdate(req.body.id, { role: newRole }, { new: true })
-    res.send({ message: 'se actualizo el rol correctamente', payload: usercatualizado })
+    let user = await userModel.findById(req.body.id)
+    if (user.role === 'PREMIUM' && newRole === 'USER') {
+        return res.send({ message: 'To become an user again you should delete your credentials!' })
+    }
+    let name = user.documents.map(item => item.name)
+    let reference = user.documents.map(item => item.reference)
+    console.log(name[0]);
+    if (name[0] === 'account' && name[1] === 'adress' && name[2] === 'info') {
+        let usercatualizado = await userModel.findByIdAndUpdate(req.body.id, { role: newRole }, { new: true })
+        res.send({ message: 'se actualizo el rol correctamente', payload: usercatualizado })
+    } else {
+        res.send({ message: 'You have not uploaded your documents!' })
+    }
+})
+
+userRouter.post('/premium/:uid/clear', async (req, res) => {
+    let user = await userModel.findById(req.params.uid)
+    let name = user.documents.map(item => item.name)
+    let reference = user.documents.map(item => item.reference)
+    for (let i = 0; i < name.length; i++) {
+        let pathToDelete = path.join(__dirname, '..', `./public/documents/${name[i]}/${reference[i]}`)
+        fs.unlink(pathToDelete, (err) => {
+            if (err) {
+                req.logger.error(`Error deleting file: ${err}`);
+            } else {
+                req.logger.info('File deleted successfully.');
+            }
+        })
+    }
+    let deletedDocuments = await userModel.findByIdAndUpdate(req.params.uid, { documents: [], role: 'USER' }, { new: true })
+
+    res.send({ data: deletedDocuments, message: 'documents deleted' })
 })
 
 userRouter.get('/:uid/documents', async (req, res) => {
@@ -50,9 +85,9 @@ userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount
             let filePath = account[0].path
             fs.unlink(filePath, (err) => {
                 if (err) {
-                    console.error(`Error deleting file: ${err}`);
+                    req.logger.error(`Error deleting file: ${err}`);
                 } else {
-                    console.log('File deleted successfully.');
+                    req.logger.info('File deleted successfully.');
                 }
             });
         }
@@ -60,9 +95,9 @@ userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount
             let filePath = adress[0].path
             fs.unlink(filePath, (err) => {
                 if (err) {
-                    console.error(`Error deleting file: ${err}`);
+                    req.logger.error(`Error deleting file: ${err}`);
                 } else {
-                    console.log('File deleted successfully.');
+                    req.logger.info('File deleted successfully.');
                 }
             });
         }
@@ -70,9 +105,9 @@ userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount
             let filePath = filePath[0].path
             fs.unlink(filePath, (err) => {
                 if (err) {
-                    console.error(`Error deleting file: ${err}`);
+                    req.logger.error(`Error deleting file: ${err}`);
                 } else {
-                    console.log('File deleted successfully.');
+                    req.logger.info('File deleted successfully.');
                 }
             });
         }
@@ -85,7 +120,6 @@ userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount
                 { name: adress[0].fieldname, reference: adress[0].filename },
                 { name: info[0].fieldname, reference: info[0].filename },
             ],
-        role: 'PREMIUM'
     }, { new: true })
     //let cleanUser = new DocumentDTO(user)
     res.render('documents_post', { products, profiles, account, adress, info, user })

@@ -8,3 +8,10 @@ Current role: {{role}}
     <input type="hidden" name="id" value="{{_id}}">
     <button type="submit">Submit</button>
 </form>
+<br>
+<form method="POST" action="/api/users/premium/{{_id}}/clear">
+    Delete your documents
+    <button type="submit">Delete credentials</button>
+</form>
+<br>
+<h2> <a href="/api/users/{{_id}}/documents">Upload the documents and become premium</a></h2>
