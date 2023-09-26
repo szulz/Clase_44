@@ -18,8 +18,6 @@ class MailController {
     }
 
     async sentMail(req, res) {
-        console.log(req.body);
-        console.log('lo envie');
         let userEmail = req.user.email
         let message = req.body.message
         let subject = req.body.subject

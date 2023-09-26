@@ -12,7 +12,6 @@ class ProductController {
     async createOne(req, res) {
         //TODO: SEGUIR MEJORANDO EL CODIGO REPETITIVO!!!!!!!!
         const picture_filename = req.file ? req.file.filename : null;
-        console.log(picture_filename);
         if (!req.session.user) {
             let fakeUser = { role: 'ADMIN', userID: null }
             let role = fakeUser.role

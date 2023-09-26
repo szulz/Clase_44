@@ -1,21 +1,18 @@
-Current role: {{role}}
-{{#if show}}
+<h1>ADMIN VIEW</h1>
+TARGET => <br>
+user: {{email}} <br>
+role: {{role}} <br>
 <form method="POST" action="/api/users/premium/{{_id}}">
     <input type="hidden" name="role" id="role" value="PREMIUM">
     <input type="hidden" name="id" value="{{_id}}">
     <button type="submit">BECOME PREMIUM</button>
 </form>
 <h2> <a href="/api/users/{{_id}}/documents">Upload the documents and become premium</a></h2>
-{{else}}
 <br>
 <form method="POST" action="/api/users/premium/{{_id}}/clear">
     Delete your documents (back to user)
     <button type="submit">Delete credentials</button>
 </form>
 <br>
-{{/if}}
-
-
-
 
 <a href="/products"> <- Go back </a>

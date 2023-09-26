@@ -9,37 +9,54 @@ const path = require('path');
 
 userRouter.get('/premium/:uid', async (req, res) => {
     try {
-        let user = await userModel.findById(req.params.uid)
-        if (user.role === 'USER') {
-            user.show = true
+        let uid = await userModel.findById(req.params.uid)
+        let userInSession = req.user
+        if (userInSession.role != 'ADMIN') {
+            if (uid._id.toString() === userInSession._id.toString()) {
+                if (uid.role === 'USER') {
+                    uid.show = true
+                }
+                if (uid.role === 'PREMIUM') {
+                    uid.show = false
+                }
+            } else {
+                return res.send({ message: 'You cant modify other users' })
+            }
+        } else {
+            return res.render('userRoleChangerAdmin', uid)
         }
-        if (user.role === 'PREMIUM') {
-            user.show = false
-        }
-        res.render('userRoleChanger', user)
+        return res.render('userRoleChanger', uid)
     } catch {
         res.send({ message: 'try with another uid' })
     }
 })
 
 userRouter.post('/premium/:uid', async (req, res) => {
-    let newRole = req.body.role
-    if (newRole !== 'USER' && newRole !== 'PREMIUM') {
-        req.logger.warn('NOT ALLOW TO CHANGE THE VALUES')
-        return res.render('login')
-    }
-    let user = await userModel.findById(req.body.id)
-    if (user.role === 'PREMIUM' && newRole === 'USER') {
-        return res.send({ message: 'To become an user again you should delete your credentials!' })
-    }
-    let name = user.documents.map(item => item.name)
-    let reference = user.documents.map(item => item.reference)
-    console.log(name[0]);
-    if (name[0] === 'account' && name[1] === 'adress' && name[2] === 'info') {
-        let usercatualizado = await userModel.findByIdAndUpdate(req.body.id, { role: newRole }, { new: true })
-        res.send({ message: 'se actualizo el rol correctamente', payload: usercatualizado })
-    } else {
-        res.send({ message: 'You have not uploaded your documents!' })
+    try {
+        let user = await userModel.findById(req.body.id)
+        if (req.user.role != 'ADMIN') {
+            if (user._id.toString() != req.user._id.toString()) {
+                return res.send({ message: 'You do not have the permissions to perform this action' })
+            }
+        }
+        let newRole = req.body.role
+        if (newRole !== 'USER' && newRole !== 'PREMIUM') {
+            req.logger.warn('NOT ALLOW TO CHANGE THE VALUES')
+            return res.render('login')
+        }
+        if (user.role === 'PREMIUM' && newRole === 'USER') {
+            return res.send({ message: 'To become an user again you should delete your credentials!' })
+        }
+        let name = user.documents.map(item => item.name)
+        let reference = user.documents.map(item => item.reference)
+        if (name[0] === 'account' && name[1] === 'adress' && name[2] === 'info') {
+            let usercatualizado = await userModel.findByIdAndUpdate(req.body.id, { role: newRole }, { new: true })
+            return res.send({ message: 'se actualizo el rol correctamente', payload: usercatualizado })
+        } else {
+            return res.send({ message: 'You have not uploaded your documents!' })
+        }
+    } catch {
+        return res.redirect('/auth/login')
     }
 })
 
