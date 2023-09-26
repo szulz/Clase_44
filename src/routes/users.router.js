@@ -6,8 +6,10 @@ const products_uploader = require('../middlewares/multer_products');
 const DocumentDTO = require('../model/DTO/documents.dto');
 const fs = require('fs');
 const path = require('path');
+const Auth = require('../middlewares/auth.js')
+const auth = new Auth
 
-userRouter.get('/premium/:uid', async (req, res) => {
+userRouter.get('/premium/:uid', auth.allowUsersInSession, async (req, res) => {
     try {
         let uid = await userModel.findById(req.params.uid)
         let userInSession = req.user
@@ -31,7 +33,7 @@ userRouter.get('/premium/:uid', async (req, res) => {
     }
 })
 
-userRouter.post('/premium/:uid', async (req, res) => {
+userRouter.post('/premium/:uid', auth.allowUsersInSession, async (req, res) => {
     try {
         let user = await userModel.findById(req.body.id)
         if (req.user.role != 'ADMIN') {
@@ -60,8 +62,13 @@ userRouter.post('/premium/:uid', async (req, res) => {
     }
 })
 
-userRouter.post('/premium/:uid/clear', async (req, res) => {
+userRouter.post('/premium/:uid/clear', auth.allowUsersInSession, async (req, res) => {
     let user = await userModel.findById(req.params.uid)
+    if (req.user.role != 'ADMIN') {
+        if (user._id.toString() != req.user._id.toString()) {
+            return res.send({ message: 'You do not have the permissions to perform this action' })
+        }
+    }
     let name = user.documents.map(item => item.name)
     let reference = user.documents.map(item => item.reference)
     for (let i = 0; i < name.length; i++) {
@@ -79,15 +86,15 @@ userRouter.post('/premium/:uid/clear', async (req, res) => {
     res.send({ data: deletedDocuments, message: 'documents deleted' })
 })
 
-userRouter.get('/:uid/documents', async (req, res) => {
+userRouter.get('/:uid/documents', auth.allowUsersInSession, async (req, res) => {
     try {
         let user = req.params.uid
         let foundUser = await userModel.findById(req.params.uid)
-        /*
-        if (foundUser.role === 'PREMIUM') {
-            return res.send({ message: 'You are already a premium user, dont need to upload documents' })
+        if (req.user.role != 'ADMIN') {
+            if (foundUser._id.toString() != req.user._id.toString()) {
+                return res.send({ message: 'You do not have the permissions to perform this action' })
+            }
         }
-        */
         return res.render('documents_get', { user })
     } catch {
         res.send({ message: 'try with another uid!' })
@@ -95,13 +102,19 @@ userRouter.get('/:uid/documents', async (req, res) => {
 })
 
 
-userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount: 5 }, { name: 'products', maxCount: 5 }, { name: 'account', maxCount: 5 }, { name: 'adress', maxCount: 5 }, { name: 'info', maxCount: 5 }]), async (req, res) => {
+userRouter.post('/:uid/documents', auth.allowUsersInSession, uploader.fields([{ name: 'profiles', maxCount: 5 }, { name: 'products', maxCount: 5 }, { name: 'account', maxCount: 5 }, { name: 'adress', maxCount: 5 }, { name: 'info', maxCount: 5 }]), async (req, res) => {
     let account = req.files.account
     let adress = req.files.adress
     let info = req.files.info
     let products = req.files.products
     let profiles = req.files.profiles
     let documents = req.files.documents
+    let user = await userModel.findById(req.params.uid)
+    if (req.user.role != 'ADMIN') {
+        if (user._id.toString() != req.user._id.toString()) {
+            return res.send({ message: 'You do not have the permissions to perform this action' })
+        }
+    }
     if (account == undefined || adress == undefined || info == undefined) {
         await userModel.findByIdAndUpdate(req.params.uid, { documents: [] }, { new: true })
         if (account != undefined) {
