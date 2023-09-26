@@ -1,7 +1,6 @@
 <button onclick="logOut()">Log Out</button> <br> <br>
 <a href="/profile">👥PROFILE</a>||<a href="/carts/{{cartId}}">🛒 GO TO CART</a> ||<a href="/mail">📧 CONTACT US</a> ||
-<a href="/sms">💬 SMS</a> || <a href="/chat">🗣️ CHAT</a><br>
-
+<a href="/sms">💬 SMS</a> || <a href="/chat">🗣️ CHAT</a> || <a href="/api/users/{{userID}}/documents">⭐ BECOME PREMIUM</a><br>
 <br>
 {{#each products}}
 <div>
@@ -23,5 +22,4 @@ Page: {{#if getAll.prevLink}} <a href="{{getAll.prevLink}}">prev</a> {{/if}} {{g
 getAll.nextLink}}<a href="{{getAll.nextLink}}">next</a>{{/if}}
 
 <br>
-
 <script src="/js/views.js"></script>

@@ -10,6 +10,12 @@ const path = require('path');
 userRouter.get('/premium/:uid', async (req, res) => {
     try {
         let user = await userModel.findById(req.params.uid)
+        if (user.role === 'USER') {
+            user.show = true
+        }
+        if (user.role === 'PREMIUM') {
+            user.show = false
+        }
         res.render('userRoleChanger', user)
     } catch {
         res.send({ message: 'try with another uid' })
@@ -113,7 +119,7 @@ userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount
         }
         return res.send({ message: 'You must upload all 3 files to sucessfully update your status' })
     }
-    let user = await userModel.findByIdAndUpdate(req.params.uid, {
+    let { _id } = await userModel.findByIdAndUpdate(req.params.uid, {
         documents:
             [
                 { name: account[0].fieldname, reference: account[0].filename },
@@ -122,7 +128,7 @@ userRouter.post('/:uid/documents', uploader.fields([{ name: 'profiles', maxCount
             ],
     }, { new: true })
     //let cleanUser = new DocumentDTO(user)
-    res.render('documents_post', { products, profiles, account, adress, info, user })
+    res.render('documents_post', { products, profiles, account, adress, info, _id })
 
 })
 

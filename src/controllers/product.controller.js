@@ -91,11 +91,12 @@ class ProductController {
     async showAll(req, res) {
         let cartId = await req.session.user.cartID
         let getAll = await productService.getAll(req.query, req.originalUrl);
+        let userID = req.session.user.userID
         const { payload } = getAll
         let products = payload.map((payload) => {
             return { title: payload.title, description: payload.description, price: payload.price, stock: payload.stock, _id: JSON.stringify(payload._id), picture_filename: payload.picture_filename }
         })
-        return res.render("products", { products, getAll, cartId, PORT })
+        return res.render("products", { products, getAll, cartId, PORT, userID })
     }
 
     async returnOne(req, res) {

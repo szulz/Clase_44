@@ -1,13 +1,11 @@
 Current role: {{role}}
+{{#if show}}
 <form method="POST" action="/api/users/premium/{{_id}}">
-    <label for="role">Select a Role:</label>
-    <select name="role" id="role">
-        <option value="USER">USER</option>
-        <option value="PREMIUM">PREMIUM</option>
-    </select>
+    <input type="hidden" name="role" id="role" value="PREMIUM">
     <input type="hidden" name="id" value="{{_id}}">
-    <button type="submit">Submit</button>
+    <button type="submit">BECOME PREMIUM</button>
 </form>
+{{/if}}
 <br>
 <form method="POST" action="/api/users/premium/{{_id}}/clear">
     Delete your documents (back to user)
