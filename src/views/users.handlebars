@@ -1,0 +1,9 @@
+<h1>USER LIST</h1>
+{{#each users}}
+USER ID: {{this._id}}
+<ul>
+    <li>Name: {{this.first_name}}</li>
+    <li>Email: {{this.email}} </li>
+    <li>Role: {{this.role}}</li>
+</ul>
+{{/each}}

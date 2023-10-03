@@ -6,8 +6,64 @@ const products_uploader = require('../middlewares/multer_products');
 const DocumentDTO = require('../model/DTO/documents.dto');
 const fs = require('fs');
 const path = require('path');
-const Auth = require('../middlewares/auth.js')
+const Auth = require('../middlewares/auth.js');
+const { listIndexes } = require('../model/schemas/users.model');
+const MailController = require('../controllers/mail.controller');
+const mailController = new MailController
 const auth = new Auth
+
+userRouter.get('/', async (req, res) => {
+    let users = await userModel.find().lean()
+    res.render('users', { users })
+})
+
+userRouter.delete('/', async (req, res) => {
+    let users = await userModel.find()
+    let lastConnection = users.map(x => x.last_connection)
+    let id = users.map(x => x._id)
+    const deletedUsers = []
+    for (let i = 0; i < lastConnection.length; i++) {
+        let timeDiference = Date.now() - lastConnection[i]
+        const hourDiference = timeDiference / (60 * 60 * 1000)
+        if (hourDiference > 2.5) {
+            console.log(`se elimino el user con id ${id[i]}`);
+            let response = await userModel.findOneAndDelete(id[i]);
+            await mailController.deletedAccountMail(response.email)
+            deletedUsers.push(response)
+        }
+    }
+    if (deletedUsers.length > 0) {
+        return res.send({ message: 'the following users has been deleted:', payload: deletedUsers })
+    }
+    return res.send({ message: 'No users has been deleted!' })
+})
+
+userRouter.get('/admin', async (req, res) => {
+    let users = await userModel.find().lean()
+    res.render('apiUsersAdminGet', { users })
+})
+
+userRouter.get('/admin/:uid', async (req, res) => {
+    let uid = req.params.uid
+    let user = await userModel.findById(uid).lean()
+    console.log(user._id);
+    res.render('apiUsersAdminUid', { user })
+})
+
+userRouter.post('/admin/:uid', async (req, res) => {
+    let user = req.params.uid
+    console.log(user);
+    let newRole = req.body.role
+    let deleteUser = req.body.delete
+    if (newRole) {
+        await userModel.findByIdAndUpdate(user, { role: newRole }, { new: true })
+        return res.send({ message: `The role has been updated to ${newRole}` })
+    }
+    if (deleteUser == 1) {
+        await userModel.findByIdAndDelete(user)
+        return res.send({ message: 'The role has been removed' })
+    }
+}) 
 
 userRouter.get('/premium/:uid', auth.allowUsersInSession, async (req, res) => {
     try {
@@ -25,11 +81,15 @@ userRouter.get('/premium/:uid', auth.allowUsersInSession, async (req, res) => {
                 return res.send({ message: 'You cant modify other users' })
             }
         } else {
-            return res.render('userRoleChangerAdmin', uid)
+            let allUsers = await userModel.find()
+            let id = allUsers.map(x => x._id).toString().split(',')
+            let email = allUsers.map(x => x.email)
+            ///////////////////////////////////////FIX//////////////////////////////////////////////////////////////////
+            return res.render('userRoleChangerAdmin', { mergedArray })
         }
         return res.render('userRoleChanger', uid)
     } catch {
-        res.send({ message: 'try with another uid' })
+        res.send({ message: 'something went wrong' })
     }
 })
 

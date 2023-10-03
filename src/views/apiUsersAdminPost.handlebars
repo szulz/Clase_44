@@ -1,0 +1,29 @@
+<h1>USER ID: {{user._id}}</h1>
+<ul>
+    <li>First Name: {{user.first_name}}</li>
+    <li>Last Name: {{user.last_name}}</li>
+    <li>Email: {{user.email}} </li>
+    <li>Cart: {{user.cart}}</li>
+    <li>Current Role: {{user.role}}
+        <form method="POST" action="/api/users/admin-modify">
+            <label for="role">Update role:</label>
+            <select name="role" id="role">
+                <option value="USER">USER</option>
+                <option value="PREMIUM">PREMIUM</option>
+                <option value="ADMIN">ADMIN</option>
+            </select>
+            <input type="hidden" name="id" value="{{user._id}}">
+            <button type="submit">UPDATE</button>
+        </form>
+    </li>
+    <li>Last Connection: {{user.last_connection}}</li>
+    <li>Documents: {{user.documents}}</li>
+</ul>
+
+<form method="POST" action="/api/users/admin-modify">
+    <input type="hidden" name="id" value="{{user._id}}">
+    <input type="hidden" name="idToDelete" value="{{user._id}}">
+    <button type="submit">DELETE USER</button>
+</form>
+
+<a href="/api/users/admin-view">Go back</a> <br>

@@ -49,6 +49,21 @@ class MailController {
         });
         return result
     }
+
+    async deletedAccountMail(email) {
+        let userEmail = email
+        let subject = 'Deleted Account'
+        const result = await transport.sendMail({
+            from: GOOGLE_EMAIL,
+            to: userEmail,
+            subject: subject,
+            html: `
+                <div>
+                    <h1>Your account has been removed due to inactivity, please if you want to come back feel free to register once again!</h1>
+                    `,
+        });
+        return result
+    }
 }
 
 module.exports = MailController
