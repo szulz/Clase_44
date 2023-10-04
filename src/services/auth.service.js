@@ -52,7 +52,7 @@ class AuthService {
 
     async updatePassword(id, password) {
         let newPassword = createHash(password)
-        let user = await userModel.findOneAndUpdate(id, { password: newPassword }, { new: true })
+        let user = await userModel.findByIdAndUpdate(id, { password: newPassword }, { new: true })
         console.log(user);
         return user
     }

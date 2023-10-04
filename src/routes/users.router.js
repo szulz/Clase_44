@@ -27,7 +27,7 @@ userRouter.delete('/', async (req, res) => {
         const hourDiference = timeDiference / (60 * 60 * 1000)
         if (hourDiference > 2.5) {
             console.log(`se elimino el user con id ${id[i]}`);
-            let response = await userModel.findOneAndDelete(id[i]);
+            let response = await userModel.findByIdAndDelete(id[i]);
             await mailController.deletedAccountMail(response.email)
             deletedUsers.push(response)
         }
@@ -56,14 +56,32 @@ userRouter.post('/admin/:uid', async (req, res) => {
     let newRole = req.body.role
     let deleteUser = req.body.delete
     if (newRole) {
-        await userModel.findByIdAndUpdate(user, { role: newRole }, { new: true })
+        if (newRole === 'PREMIUM' || newRole === 'ADMIN') {
+            await userModel.findByIdAndUpdate(user, {
+                role: newRole,
+                documents:
+                    [{
+                        name: 'ADMIN',
+                        reference: 'ADMIN',
+                    }, {
+                        name: 'ADMIN',
+                        reference: 'ADMIN',
+                    },
+                    {
+                        name: 'ADMIN',
+                        reference: 'ADMIN',
+                    }]
+            }, { new: true })
+            return res.send({ message: `The role has been updated to ${newRole}` })
+        }
+        await userModel.findByIdAndUpdate(user, { role: newRole, documents: [] }, { new: true })
         return res.send({ message: `The role has been updated to ${newRole}` })
     }
     if (deleteUser == 1) {
         await userModel.findByIdAndDelete(user)
         return res.send({ message: 'The role has been removed' })
     }
-}) 
+})
 
 userRouter.get('/premium/:uid', auth.allowUsersInSession, async (req, res) => {
     try {
