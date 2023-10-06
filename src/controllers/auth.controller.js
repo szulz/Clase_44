@@ -16,8 +16,7 @@ class AuthController {
     async logOut(req, res, next) {
         await userModel.findByIdAndUpdate(req.session.user.userID, ({ last_connection: Date.now() }), { new: true })
         authService.logOut(req.session)
-        res.redirect('/auth/login')
-        next()
+        return res.redirect('/auth/login')
     }
 
     async logInGet(req, res) {

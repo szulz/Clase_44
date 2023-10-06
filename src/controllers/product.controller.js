@@ -6,6 +6,8 @@ const ProductService = require("../services/product.service.js");
 const productService = new ProductService
 const ProductManagerMongoose = require('../services/product.service.js');
 const userModel = require('../model/schemas/users.model.js')
+const MailController = require('./mail.controller.js')
+const mailController = new MailController
 
 class ProductController {
 
@@ -43,6 +45,24 @@ class ProductController {
 
     }
 
+    async getIds(req, res) {
+        let products = await productModel.find()
+        let ids = products.map(x => x._id)
+        let titles = products.map(y => y.title)
+        let owner = products.flatMap(z => z.owner.map(p => p.status))
+        let list = []
+        for (let i = 0; i < ids.length; i++) {
+            let test = `${titles[i]}=> ${owner[i]} => ${ids[i]}`
+            list.push(test)
+        }
+        return res.status(200).json({
+            status: 'Success!',
+            amount: `Products => ${ids.length}`,
+            data: list,
+        })
+
+    }
+
     async modifyProperties(req, res) {
         //cree algunas de las funciones directamente en el modelo ya que no veia necesario usar el service 
         //para llamar unicamente a una funcion que directamente lo puedo hacer acá
@@ -61,7 +81,10 @@ class ProductController {
         let user = await userModel.findById(userId)
         let productId = req.params.pid
         let product = await productModel.findById(productId)
+        let product_status = product.owner.map(x => x.status)
+        let product_createdBy = product.owner.map(x => x.createdBy)
         let productCreatedBy = product.owner.map(product => product.createdBy).toString()
+        let productsOwner = await userModel.findById(product_createdBy)
         if (user.role == 'PREMIUM') {
             if (productCreatedBy == userId) {
                 console.log('primium borro su producto');
@@ -76,8 +99,10 @@ class ProductController {
         if (user.role == 'ADMIN') {
             console.log('admin borro producto');
             await productDao.deleteProduct(productId)
+            await mailController.deletePremiumUsersProduct(productsOwner.email, user.email, product.title, user.role)
             return res.status(200).send({
                 status: 'Product successfully deleted!',
+                message: `We sent the product owner an email to notify his product being removed!`
             })
         }
     }

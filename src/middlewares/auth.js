@@ -74,7 +74,7 @@ class Auth {
     async denieUser(req, res, next) {
         try {
             if (req.user.role == 'USER') {
-                res.send({ message: 'USERS dont have permission to do that' })
+                return res.send({ message: 'USERS dont have permission to do that' })
             }
             return next()
         } catch {

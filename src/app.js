@@ -9,9 +9,7 @@ const sessionRouter = require('./routes/sessions.router.js');
 const cartsRouter = require('./routes/carts.router.js')
 const authRouter = require('./routes/auth.router.js');
 const smsRouter = require('./routes/sms.router.js');
-const mockingRouter = require('./routes/mocking.router.js');
 const errorHandler = require('./middlewares/error.js')
-const errorRouter = require('./routes/error.router.js');
 const { addLogger, logger } = require('./utils/logger.js');
 const swaggerJSDoc = require('swagger-jsdoc')
 const swaggerUiExpress = require('swagger-ui-express')
@@ -92,8 +90,6 @@ app.use('/profile', profileRouter)
 app.use('/mail', mailRouter)
 app.use('/sms', smsRouter)
 app.use('/chat', chatRouter)
-app.use('/mockingproducts', mockingRouter)
-app.use('/loggerTest', errorRouter)
 app.use(errorHandler)
 
 const httpServer = app.listen(PORT, () => {

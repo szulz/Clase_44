@@ -9,7 +9,7 @@ const uploader = require('../middlewares/multer.js');
 const cartsController = new CartsController
 const authController = new AuthController
 
-authRouter.get('/logOut', cartsController.returnCartStock, authController.logOut)
+authRouter.get('/logOut', auth.allowUsersInSession, cartsController.returnCartStock, authController.logOut)
 
 authRouter.get('/login', auth.denieUsersInSession, authController.logInGet)
 

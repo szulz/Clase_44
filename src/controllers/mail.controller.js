@@ -64,6 +64,21 @@ class MailController {
         });
         return result
     }
+
+    async deletePremiumUsersProduct(email, responsableEmail, productDeleted, responsableRole) {
+        let targetedEmail = email
+        let subject = 'Deleted Product'
+        const result = await transport.sendMail({
+            from: GOOGLE_EMAIL,
+            to: targetedEmail,
+            subject: subject,
+            html: `
+                <div>
+                    <h1> Your product '${productDeleted}' has been removed by the ${responsableRole} user:'${responsableEmail}' </h1>
+                    `,
+        });
+        return result
+    }
 }
 
 module.exports = MailController
