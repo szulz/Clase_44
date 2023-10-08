@@ -92,6 +92,17 @@ class Auth {
             return res.redirect('/auth/login')
         }
     }
+
+    async allowAdmin(req, res, next) {
+        try {
+            if (req.user.role == 'ADMIN') {
+                return next()
+            }
+            return res.redirect('/auth/login')
+        } catch {
+            return res.redirect('/auth/login')
+        }
+    }
 }
 
 

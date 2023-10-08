@@ -23,7 +23,6 @@ productRouter.get('/create', auth.denieUser, auth.allowPremiumAdmin, async (req,
     res.render('createProduct')
 });
 
-//agergar middlewares
 productRouter.post('/create', auth.denieUser, auth.allowPremiumAdmin, products_uploader.single('store'), productController.createOne)
 
 module.exports = productRouter;
