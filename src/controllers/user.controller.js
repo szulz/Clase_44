@@ -153,14 +153,16 @@ class UserController {
         let products = req.files.products
         let profiles = req.files.profiles
         let documents = req.files.documents
-        let user = await userModel.findById(req.params.uid)
+        let sessionUser = req.user
+        let userId = req.params.uid
+        let user = await userModel.findById(userId)
         if (req.user.role != 'ADMIN') {
             if (user._id.toString() != req.user._id.toString()) {
                 return res.send({ message: 'You do not have the permissions to perform this action' })
             }
         }
         if (account == undefined || adress == undefined || info == undefined) {
-            await userModel.findByIdAndUpdate(req.params.uid, { documents: [] }, { new: true })
+            await userModel.findByIdAndUpdate(userId, { documents: [] }, { new: true })
             if (account != undefined) {
                 let filePath = account[0].path
                 fs.unlink(filePath, (err) => {
@@ -193,7 +195,7 @@ class UserController {
             }
             return res.send({ message: 'You must upload all 3 files to sucessfully update your status' })
         }
-        let { _id } = await userModel.findByIdAndUpdate(req.params.uid, {
+        let { _id } = await userModel.findByIdAndUpdate(userId, {
             documents:
                 [
                     { name: account[0].fieldname, reference: account[0].filename },
