@@ -2,8 +2,9 @@ const MailController = require("../controllers/mail.controller")
 const mailController = new MailController
 const UsersDao = require("../model/DAOs/users/users.dao")
 const usersDao = new UsersDao
-
-
+const fs = require('fs')
+const path = require("path")
+const { logger } = require('../utils/logger.js')
 
 class UserService {
     async cleanInactiveUsers() {
@@ -50,14 +51,15 @@ class UserService {
         }
     }
 
-    async becomePremium(userInSession, user, newRole) {
+    async becomePremium(userInSession, id, newRole) {
+        let user = await usersDao.findById(id)
         if (userInSession.role != 'ADMIN') {
             if (user._id.toString() != userInSession._id.toString()) {
                 return res.send({ message: 'You do not have the permissions to perform this action' })
             }
         }
         if (newRole !== 'USER' && newRole !== 'PREMIUM') {
-            req.logger.warn('NOT ALLOW TO CHANGE THE VALUES')
+            logger.warn('NOT ALLOW TO CHANGE THE VALUES')
             throw new Error('You cannot modify the preset values!')
         }
         if (user.role === 'PREMIUM' && newRole === 'USER') {
@@ -70,6 +72,67 @@ class UserService {
             return usercatualizado
         } else {
             throw new Error('You have not uploaded your documents!')
+        }
+    }
+
+    async postDocuments(userId, sessionUser, account, adress, info) {
+        let user = await usersDao.findById(userId)
+        if (sessionUser.role != 'ADMIN') {
+            if (user._id.toString() != sessionUser._id.toString()) {
+                throw new Error('You do not have the permissions to perform this action')
+            }
+        }
+        if (account == undefined || adress == undefined || info == undefined) {
+            await usersDao.findByIdAndUpdate(userId, { documents: [] })
+            if (account != undefined) {
+                let filePath = account[0].path
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        logger.error(`Error deleting file: ${err}`);
+                    } else {
+                        logger.info('File deleted successfully.');
+                    }
+                });
+            }
+            if (adress != undefined) {
+                let filePath = adress[0].path
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        logger.error(`Error deleting file: ${err}`);
+                    } else {
+                        logger.info('File deleted successfully.');
+                    }
+                });
+            }
+            if (info != undefined) {
+                let filePath = filePath[0].path
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        logger.error(`Error deleting file: ${err}`);
+                    } else {
+                        logger.info('File deleted successfully.');
+                    }
+                });
+            }
+            throw new Error('You must upload all 3 files to sucessfully update your status')
+        }
+        let { _id } = await usersDao.findByIdAndUpdate(userId, {
+            documents:
+                [
+                    { name: account[0].fieldname, reference: account[0].filename },
+                    { name: adress[0].fieldname, reference: adress[0].filename },
+                    { name: info[0].fieldname, reference: info[0].filename },
+                ],
+        })
+        return _id
+    }
+
+    async uploaderView(user, currentUser) {
+        let foundUser = await usersDao.findById(user)
+        if (currentUser.role != 'ADMIN') {
+            if (foundUser._id.toString() != currentUser._id.toString()) {
+                throw new Error('You do not have the permissions to perform this action')
+            }
         }
     }
 }

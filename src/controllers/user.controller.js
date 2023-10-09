@@ -54,6 +54,7 @@ class UserController {
         try {
             let userInSession = req.user
             let targetId = req.params.uid
+            //puedo meted el target en el service
             let targetUser = await userDAo.findById(targetId)
             if (userInSession.role != 'ADMIN') {
                 targetUser = await userService.roleChecker(targetUser, userInSession)
@@ -97,10 +98,10 @@ class UserController {
 
     async becomePremium(req, res) {
         try {
-            let user = await userModel.findById(req.body.id)
+            let id = req.body.id
             let newRole = req.body.role
             let userInSession = req.user
-            let usercatualizado = await userService.becomePremium(userInSession, user, newRole)
+            let usercatualizado = await userService.becomePremium(userInSession, id, newRole)
             return res.send({ message: 'se actualizo el rol correctamente', payload: usercatualizado })
         } catch (error) {
             return res.send(error.message)
@@ -134,78 +135,28 @@ class UserController {
     async uploaderView(req, res) {
         try {
             let user = req.params.uid
-            let foundUser = await userModel.findById(req.params.uid)
-            if (req.user.role != 'ADMIN') {
-                if (foundUser._id.toString() != req.user._id.toString()) {
-                    return res.send({ message: 'You do not have the permissions to perform this action' })
-                }
-            }
+            let currentUser = req.user
+            await userService.uploaderView(user, currentUser)
             return res.render('documents_get', { user })
-        } catch {
-            res.send({ message: 'try with another uid!' })
+        } catch (error) {
+            return res.send(error.message)
         }
     }
 
     async postDocuments(req, res) {
-        let account = req.files.account
-        let adress = req.files.adress
-        let info = req.files.info
-        let products = req.files.products
-        let profiles = req.files.profiles
-        let documents = req.files.documents
-        let sessionUser = req.user
-        let userId = req.params.uid
-        let user = await userModel.findById(userId)
-        if (req.user.role != 'ADMIN') {
-            if (user._id.toString() != req.user._id.toString()) {
-                return res.send({ message: 'You do not have the permissions to perform this action' })
-            }
+        try {
+            let account = req.files.account
+            let adress = req.files.adress
+            let info = req.files.info
+            let products = req.files.products
+            let profiles = req.files.profiles
+            let sessionUser = req.user
+            let userId = req.params.uid
+            let _id = await userService.postDocuments(userId, sessionUser, account, adress, info)
+            return res.render('documents_post', { products, profiles, account, adress, info, _id })
+        } catch (error) {
+            return res.send(error.message)
         }
-        if (account == undefined || adress == undefined || info == undefined) {
-            await userModel.findByIdAndUpdate(userId, { documents: [] }, { new: true })
-            if (account != undefined) {
-                let filePath = account[0].path
-                fs.unlink(filePath, (err) => {
-                    if (err) {
-                        req.logger.error(`Error deleting file: ${err}`);
-                    } else {
-                        req.logger.info('File deleted successfully.');
-                    }
-                });
-            }
-            if (adress != undefined) {
-                let filePath = adress[0].path
-                fs.unlink(filePath, (err) => {
-                    if (err) {
-                        req.logger.error(`Error deleting file: ${err}`);
-                    } else {
-                        req.logger.info('File deleted successfully.');
-                    }
-                });
-            }
-            if (info != undefined) {
-                let filePath = filePath[0].path
-                fs.unlink(filePath, (err) => {
-                    if (err) {
-                        req.logger.error(`Error deleting file: ${err}`);
-                    } else {
-                        req.logger.info('File deleted successfully.');
-                    }
-                });
-            }
-            return res.send({ message: 'You must upload all 3 files to sucessfully update your status' })
-        }
-        let { _id } = await userModel.findByIdAndUpdate(userId, {
-            documents:
-                [
-                    { name: account[0].fieldname, reference: account[0].filename },
-                    { name: adress[0].fieldname, reference: adress[0].filename },
-                    { name: info[0].fieldname, reference: info[0].filename },
-                ],
-        }, { new: true })
-        //let cleanUser = new DocumentDTO(user)
-        res.render('documents_post', { products, profiles, account, adress, info, _id })
-
     }
 }
 
