@@ -1,21 +1,18 @@
-const { logger } = require("handlebars")
 const { PORT, ADMIN_EMAIL } = require("../config/env.config.js")
+const UsersDao = require("../model/DAOs/users/users.dao.js")
+const usersDao = new UsersDao
 const SessionDTO = require("../model/DTO/session.dto.js")
-const userModel = require("../model/schemas/users.model.js")
 const AuthService = require("../services/auth.service.js")
 const CustomError = require("../services/errors/custom-error.js")
 const EErrors = require("../services/errors/enums.js")
 const GenerateErrorCauses = require("../services/errors/info.js")
-const { generateCode, isValidPassword } = require("../utils/utils.js")
-const MailController = require("./mail.controller.js")
-const mailController = new MailController
 const generateErrorCauses = new GenerateErrorCauses
 const authService = new AuthService
 
 class AuthController {
     async logOut(req, res, next) {
-        await userModel.findByIdAndUpdate(req.session.user.userID, ({ last_connection: Date.now() }), { new: true })
-        authService.logOut(req.session)
+        let session = req.session
+        await authService.logOut(session)
         return res.redirect('/auth/login')
     }
 
@@ -26,7 +23,7 @@ class AuthController {
     async login(req, res) {
         let clearUser = new SessionDTO(await req.user)
         req.session.user = clearUser
-        await userModel.findByIdAndUpdate(clearUser.userID, ({ last_connection: Date.now() }), { new: true })
+        await usersDao.findByIdAndUpdate(clearUser.userID, { last_connection: Date.now() })
         return res.redirect('/products')
     }
 
@@ -37,8 +34,8 @@ class AuthController {
     async register(req, res) {
         let user = req.user.first_name
         return res.render('welcome', { user, PORT })
-        //podria agregar una vista de registrado successfull
     }
+
     authFailure(req, res) {
         CustomError.createError({
             name: 'Unexpected Authentication Error',
@@ -49,15 +46,14 @@ class AuthController {
     }
 
     async recovery(req, res) {
-        const email = req.body.email
-        const userFound = await authService.findUser(email)
-        if (userFound == null) {
-            return res.render('recoveryEmailNotFound')
+        try {
+            const email = req.body.email
+            let userFound = await authService.recovery(email)
+            return res.render('recoveryEmailFound', userFound)
+        } catch (error) {
+            res.send(error.message)
         }
-        const { code } = generateCode();
-        await authService.updateCode(userFound._id, code)
-        await mailController.sentRecoveryMail(email, code);
-        return res.render('recoveryEmailFound', userFound)
+
     }
 
     async passwordResetVerification(req, res) {
@@ -71,13 +67,13 @@ class AuthController {
     }
 
     async passwordReset(req, res) {
-        let { password, email } = req.body
-        let user = await authService.findUser(email)
-        if (isValidPassword(password, user.password)) {
-            res.send({ message: 'The password cannot be the same as before' })
+        try {
+            let { password, email } = req.body
+            await authService.passwordReset(email, password)
+            res.render('recoverySuccessful')
+        } catch (error) {
+            res.send(error.message)
         }
-        await authService.updatePassword(user._id, password)
-        res.render('recoverySuccessful')
     }
 }
 

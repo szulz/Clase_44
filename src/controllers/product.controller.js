@@ -12,19 +12,7 @@ const mailController = new MailController
 class ProductController {
 
     async createOne(req, res) {
-        //TODO: SEGUIR MEJORANDO EL CODIGO REPETITIVO!!!!!!!!
         const picture_filename = req.file ? req.file.filename : null;
-        if (!req.session.user) {
-            let fakeUser = { role: 'ADMIN', userID: null }
-            let role = fakeUser.role
-            let user = fakeUser.userID
-            let newProd = await productDao.createProduct(req.body, role, user, picture_filename);
-            return res.status(200).send({
-                status: 'Product successfully added!',
-                msg: `The following product has been added to the list:`,
-                data: newProd
-            });
-        }
         let role = req.session.user.role ? req.session.user.role : 'ADMIN'
         let user = req.session.user.userID ? req.session.user.userID : null
         let newProd = await productDao.createProduct(req.body, role, user, picture_filename);
@@ -64,8 +52,6 @@ class ProductController {
     }
 
     async modifyProperties(req, res) {
-        //cree algunas de las funciones directamente en el modelo ya que no veia necesario usar el service 
-        //para llamar unicamente a una funcion que directamente lo puedo hacer acá
         let updatedProduct = await productDao.updateProduct(req.params.id, req.body);
         return res.status(200).send({
             status: 'Product successfully updated!',
@@ -76,34 +62,13 @@ class ProductController {
     }
 
     async deleteById(req, res) {
-        let userId = req.user._id
-        console.log(req.user);
-        let user = await userModel.findById(userId)
-        let productId = req.params.pid
-        let product = await productModel.findById(productId)
-        let product_status = product.owner.map(x => x.status)
-        let product_createdBy = product.owner.map(x => x.createdBy)
-        let productCreatedBy = product.owner.map(product => product.createdBy).toString()
-        let productsOwner = await userModel.findById(product_createdBy)
-        if (user.role == 'PREMIUM') {
-            if (productCreatedBy == userId) {
-                console.log('primium borro su producto');
-                await productDao.deleteProduct(productId)
-                return res.status(200).send({
-                    status: 'Product successfully deleted!',
-                });
-            } else {
-                res.status(400).send({ message: 'You have to own the product or be admin to delete this product' })
-            }
-        }
-        if (user.role == 'ADMIN') {
-            console.log('admin borro producto');
-            await productDao.deleteProduct(productId)
-            await mailController.deletePremiumUsersProduct(productsOwner.email, user.email, product.title, user.role)
-            return res.status(200).send({
-                status: 'Product successfully deleted!',
-                message: `We sent the product owner an email to notify his product being removed!`
-            })
+        try {
+            let userId = req.user._id
+            let productId = req.params.pid
+            let { status, message } = await productService.deleteById(userId, productId)
+            return res.send({ status: status, message: message })
+        } catch (error) {
+            res.send(error.message)
         }
     }
 
@@ -124,12 +89,13 @@ class ProductController {
     }
 
     async returnOne(req, res) {
-        let productId = req.params.pid
-        let product = await productService.findById(productId);
-        if (product == 'not found') {
-            return res.status(400).send({ message: product })
+        try {
+            let productId = req.params.pid
+            let product = await productService.findById(productId);
+            return res.status(200).send({ message: 'product found', payload: product })
+        } catch (error) {
+            res.send(error.message)
         }
-        return res.status(200).send({ message: 'product found', payload: product })
     }
 }
 

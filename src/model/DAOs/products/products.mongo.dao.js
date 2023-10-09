@@ -8,7 +8,6 @@ class ProductDao {
     }
 
     async createProduct(newProd, role, user, picture) {
-        console.log(picture);
         newProd.owner = { createdBy: user, status: role }
         newProd.picture = picture
         const createdProduct = new productModel({

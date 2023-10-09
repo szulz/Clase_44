@@ -48,6 +48,10 @@ class UsersDao {
         return await userModel.findByIdAndUpdate(id, update, { new: true })
     }
 
+    async findOne(data) {
+        return await userModel.findOne(data)
+    }
+
 }
 
 module.exports = UsersDao

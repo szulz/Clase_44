@@ -135,6 +135,29 @@ class UserService {
             }
         }
     }
+
+    async deleteDocumentsBecomeUser(currentUser, userId) {
+        let user = await usersDao.findById(userId)
+        if (currentUser.role != 'ADMIN') {
+            if (user._id.toString() != currentUser._id.toString()) {
+                throw new Error('You do not have the permissions to perform this action')
+            }
+        }
+        let name = user.documents.map(item => item.name)
+        let reference = user.documents.map(item => item.reference)
+        for (let i = 0; i < name.length; i++) {
+            let pathToDelete = path.join(__dirname, '..', `./public/documents/${name[i]}/${reference[i]}`)
+            fs.unlink(pathToDelete, (err) => {
+                if (err) {
+                    logger.error(`Error deleting file: ${err}`);
+                } else {
+                    logger.info('File deleted successfully.');
+                }
+            })
+        }
+        let deletedDocuments = await usersDao.findByIdAndUpdate(userId, { documents: [], role: 'USER' })
+        return deletedDocuments
+    }
 }
 
 module.exports = UserService

@@ -18,7 +18,6 @@ class CartsController {
 
     async addProduct(req, res) {
         let cartData = await cartService.addToCart(req.session.user.cartID, req.params.pid, req.session.user.userID);
-        console.log(cartData);
         if (cartData === null) {
             return res.status(400).send({
                 status: 'not allowed',
@@ -74,7 +73,6 @@ class CartsController {
         let actualTicketId = tickets[actualPurchaser]._id
         let ticket = await ticketService.findTicketById(actualTicketId)
         req.logger.info(ticket);
-        console.log(ticket);
         res.render('checkout', ticket)
     }
 

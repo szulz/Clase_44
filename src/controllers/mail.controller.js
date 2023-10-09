@@ -13,7 +13,6 @@ const transport = nodemailer.createTransport({
 
 class MailController {
     async view(req, res) {
-
         res.render('mail', {})
     }
 
