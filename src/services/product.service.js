@@ -87,6 +87,28 @@ class ProductService {
             return { status: 'Product successfully deleted!', message: `We sent the product owner an email to notify his product being removed!` }
         }
     }
+
+    async getIds() {
+        let products = await productModel.find()
+        let ids = products.map(x => x._id)
+        let titles = products.map(y => y.title)
+        let owner = products.flatMap(z => z.owner.map(p => p.status))
+        let list = []
+        for (let i = 0; i < ids.length; i++) {
+            let test = `${titles[i]}=> ${owner[i]} => ${ids[i]}`
+            list.push(test)
+        }
+        return { ids, list }
+    }
+
+    async showAll(query, originalUrl) {
+        let getAll = await this.getAll(query, originalUrl);
+        const { payload } = getAll
+        let products = payload.map((payload) => {
+            return { title: payload.title, description: payload.description, price: payload.price, stock: payload.stock, _id: JSON.stringify(payload._id), picture_filename: payload.picture_filename }
+        })
+        return { products, getAll }
+    }
 };
 
 

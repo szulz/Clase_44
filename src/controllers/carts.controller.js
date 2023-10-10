@@ -17,27 +17,18 @@ class CartsController {
     }
 
     async addProduct(req, res) {
-        let cartData = await cartService.addToCart(req.session.user.cartID, req.params.pid, req.session.user.userID);
-        if (cartData === null) {
-            return res.status(400).send({
-                status: 'not allowed',
-                msg: 'You cannot add to the cart a product that you created'
-            })
+        try {
+            let { status, message, payload } = await cartService.addToCart(req.session.user.cartID, req.params.pid, req.session.user.userID);
+            return res.send({ status: status, message: message, payload: payload })
+        } catch (e) {
+            return res.send(e.message)
         }
-        return res.status(200).send({
-            status: 'success',
-            msg: `A new product has been added to the cart with the id ${req.session.user.cartID}`,
-            data: cartData
-        });
     }
 
     async deleteProduct(req, res) {
         try {
-            let response = await cartService.deleteProduct(req.params.cid, req.params.pid);
-            if (response) {
-                return res.status(200).send({ msg: 'The desired product quantity has been decreased by 1', data: response })
-            };
-            res.status(200).send({ data: 'the product has been removed from the cart successfully!' });
+            let { message, response } = await cartService.deleteProduct(req.params.cid, req.params.pid);
+            return res.status(200).send({ message: message, payload: response })
         } catch (error) {
             res.status(400).send({ msg: error.message });
         }

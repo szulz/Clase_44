@@ -36,7 +36,17 @@ class CartService {
             let foundCart = await cartsDao.addProduct(cartId)
             let foundProduct = await foundCart.cart.find((item) => item.product._id == productId);
             let response = await productDao.decreaseStock(productId, foundProduct, foundCart)
-            return response
+            if (response === null) {
+                return {
+                    status: 'not allowed',
+                    message: 'You cannot add to the cart a product that you created'
+                }
+            }
+            return {
+                status: 'success',
+                message: `A new product has been added to the cart with the id ${cartId}`,
+                payload: response
+            }
         } catch (e) {
             logger.error('something went wrong in addToCart')
             throw new Error(e.message)
@@ -45,7 +55,11 @@ class CartService {
 
     async deleteProduct(cartId, productId) {
         try {
-            return await cartsDao.deleteById(cartId, productId)
+            let response = await cartsDao.deleteById(cartId, productId)
+            if (response) {
+                return { message: 'The desired product quantity has been decreased by 1', response }
+            };
+            return { message: 'the product has been removed from the cart successfully!' }
         } catch (e) {
             throw new Error(e.message)
         }

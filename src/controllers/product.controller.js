@@ -1,16 +1,10 @@
 const { PORT } = require("../config/env.config.js");
 const ProductDao = require("../model/DAOs/products/products.mongo.dao.js");
-const productModel = require("../model/schemas/product.schema.js");
 const productDao = new ProductDao
 const ProductService = require("../services/product.service.js");
 const productService = new ProductService
-const ProductManagerMongoose = require('../services/product.service.js');
-const userModel = require('../model/schemas/users.model.js')
-const MailController = require('./mail.controller.js')
-const mailController = new MailController
 
 class ProductController {
-
     async createOne(req, res) {
         const picture_filename = req.file ? req.file.filename : null;
         let role = req.session.user.role ? req.session.user.role : 'ADMIN'
@@ -34,20 +28,16 @@ class ProductController {
     }
 
     async getIds(req, res) {
-        let products = await productModel.find()
-        let ids = products.map(x => x._id)
-        let titles = products.map(y => y.title)
-        let owner = products.flatMap(z => z.owner.map(p => p.status))
-        let list = []
-        for (let i = 0; i < ids.length; i++) {
-            let test = `${titles[i]}=> ${owner[i]} => ${ids[i]}`
-            list.push(test)
+        try {
+            let { ids, list } = await productService.getIds()
+            return res.status(200).json({
+                status: 'Success!',
+                amount: `Products => ${ids.length}`,
+                data: list,
+            })
+        } catch (error) {
+            res.send(error)
         }
-        return res.status(200).json({
-            status: 'Success!',
-            amount: `Products => ${ids.length}`,
-            data: list,
-        })
 
     }
 
@@ -79,12 +69,8 @@ class ProductController {
 
     async showAll(req, res) {
         let cartId = await req.session.user.cartID
-        let getAll = await productService.getAll(req.query, req.originalUrl);
-        let userID = req.session.user.userID
-        const { payload } = getAll
-        let products = payload.map((payload) => {
-            return { title: payload.title, description: payload.description, price: payload.price, stock: payload.stock, _id: JSON.stringify(payload._id), picture_filename: payload.picture_filename }
-        })
+        let userID = await req.session.user.userID
+        let { products, getAll } = await productService.showAll(req.query, req.originalUrl)
         return res.render("products", { products, getAll, cartId, PORT, userID })
     }
 

@@ -23,7 +23,10 @@ class UserService {
                     deletedUsers.push(response)
                 }
             }
-            return deletedUsers
+            if (deletedUsers.length > 0) {
+                return { message: 'the following users has been deleted:', payload: deletedUsers }
+            }
+            return { message: 'No users has been deleted' }
         } catch {
             throw new Error()
         }

@@ -12,11 +12,8 @@ class UserController {
 
     async cleanInactiveUsers(req, res) {
         try {
-            let deletedUsers = await userService.cleanInactiveUsers()
-            if (deletedUsers.length > 0) {
-                return res.send({ message: 'the following users has been deleted:', payload: deletedUsers })
-            }
-            return res.send({ message: 'No users has been deleted!' })
+            let { message, payload } = await userService.cleanInactiveUsers()
+            return res.send({ message: message, payload: payload })
         } catch {
             res.send({ message: 'something went wrong' })
         }
