@@ -58,8 +58,7 @@ class ProductService {
 
     async findById(productId) {
         try {
-            let product = await productModel.findById(productId)
-            return product
+            return await productDao.findById(productId)
         } catch {
             throw new Error('Product not found!')
         }
@@ -67,7 +66,7 @@ class ProductService {
 
     async deleteById(userId, productId) {
         let user = await usersDao.findById(userId)
-        let product = await productModel.findById(productId)
+        let product = await productDao.findById(productId)
         let product_createdBy = product.owner.map(x => x.createdBy)
         let productCreatedBy = product.owner.map(product => product.createdBy).toString()
         let productsOwner = await usersDao.findById(product_createdBy)
@@ -89,7 +88,7 @@ class ProductService {
     }
 
     async getIds() {
-        let products = await productModel.find()
+        let products = await productDao.find()
         let ids = products.map(x => x._id)
         let titles = products.map(y => y.title)
         let owner = products.flatMap(z => z.owner.map(p => p.status))

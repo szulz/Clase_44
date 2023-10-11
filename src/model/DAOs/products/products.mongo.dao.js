@@ -3,8 +3,8 @@ const productModel = require("../../schemas/product.schema");
 
 class ProductDao {
 
-    async getAll() {
-        return productModel.find
+    async find() {
+        return await productModel.find()
     }
 
     async createProduct(newProd, role, user, picture) {
@@ -59,8 +59,7 @@ class ProductDao {
     }
 
     async findById(id) {
-        let productToCheck = await productModel.findById(id)
-        return productToCheck
+        return await productModel.findById(id)
     }
 
 }

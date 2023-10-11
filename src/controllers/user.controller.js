@@ -1,12 +1,12 @@
 const UsersDao = require("../model/DAOs/users/users.dao")
-const userDAo = new UsersDao
+const userDao = new UsersDao
 const userModel = require("../model/schemas/users.model")
 const UserService = require("../services/users.service")
 const userService = new UserService
 
 class UserController {
     async getAll(req, res) {
-        let users = await userDAo.getAllLean()
+        let users = await userDao.getAllLean()
         return res.render('users', { users })
     }
 
@@ -20,12 +20,12 @@ class UserController {
     }
 
     async adminViewUsers(req, res) {
-        let users = await userDAo.getAllLean()
+        let users = await userDao.getAllLean()
         return res.render('apiUsersAdminGet', { users })
     }
 
     async adminUserToModify(req, res) {
-        let user = await userDAo.findByIdLean(req.params.uid)
+        let user = await userDao.findByIdLean(req.params.uid)
         return res.render('apiUsersAdminUid', { user })
     }
 
@@ -39,7 +39,7 @@ class UserController {
                 return res.send({ message: `The role has been updated to ${newRole}` })
             }
             if (deleteUser == 1) {
-                await userModel.findByIdAndDelete(user)
+                await userDao.findByIdAndDelete(user)
                 return res.send({ message: 'The role has been removed' })
             }
         } catch (error) {
@@ -51,12 +51,12 @@ class UserController {
         try {
             let userInSession = req.user
             let targetId = req.params.uid
-            let targetUser = await userDAo.findById(targetId)
+            let targetUser = await userDao.findById(targetId)
             if (userInSession.role != 'ADMIN') {
                 targetUser = await userService.roleChecker(targetUser, userInSession)
                 return res.render('userRoleChanger', targetUser)
             }
-            let allUsers = await userModel.find().lean()
+            let allUsers = await userDao.findLean()
             return res.render('userRoleChangerAdmin', { allUsers })
         } catch (e) {
             return res.send({ message: e.message })
@@ -69,7 +69,7 @@ class UserController {
             let newRole = req.body.role
             let userInSession = req.user
             let usercatualizado = await userService.becomePremium(userInSession, id, newRole)
-            return res.send({ message: 'se actualizo el rol correctamente', payload: usercatualizado })
+            return res.send({ message: 'User rol successfully changed(Log out and sign in agin to see the changes)', payload: usercatualizado })
         } catch (error) {
             return res.send(error.message)
         }
@@ -80,7 +80,7 @@ class UserController {
             let currentUser = req.user
             let userId = req.params.uid
             let deletedDocuments = await userService.deleteDocumentsBecomeUser(currentUser, userId)
-            res.send({ data: deletedDocuments, message: 'documents deleted' })
+            res.send({ data: deletedDocuments, message: 'Documents deleted (Log out and sign in agin to see the changes)' })
         } catch (error) {
             res.send(error.message)
         }

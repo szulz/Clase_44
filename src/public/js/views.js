@@ -1,5 +1,3 @@
-const { SERVER_URL } = require("../../config/env.config")
-
 function deleteProduct(id) {
     fetch(`/api/products/${id}`, {
         method: "DELETE",

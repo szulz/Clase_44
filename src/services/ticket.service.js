@@ -1,26 +1,23 @@
 const TicketsDao = require("../model/DAOs/tickets/tickets.mongo.doa");
 const ticketsDao = new TicketsDao
 const ticketsModel = require("../model/schemas/tickets.schema");
-const CartService = require("./carts.service");
+const CartService = require("./carts.service.js");
 const cartService = new CartService
-
 
 class TicketService {
     async purchase(user) {
         let user_code = Math.floor(Math.random() * 100000000)
         let user_purchase_datetime = new Date();
-        let user_productsInCart = await cartService.userCart(user.cartID)
-        let user_amount = await cartService.getTotalAmount(user_productsInCart)
+        let { result } = await cartService.userCart(user.cartID)
         let user_purchaser = user.email
         let ticket = {
             code: user_code,
             purchase_datetime: user_purchase_datetime,
-            amount: user_amount,
+            amount: result,
             purchaser: user_purchaser,
         }
         let createdTicket = await ticketsDao.createTicket(ticket)
-        console.log(createdTicket);
-        return createdTicket
+        return await createdTicket.save()
     }
 
     async find() {

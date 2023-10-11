@@ -11,7 +11,10 @@ class UsersDao {
     }
 
     async findByIdAndDelete(id, index) {
-        return await userModel.findByIdAndDelete(id[index])
+        if (index) {
+            return await userModel.findByIdAndDelete(id[index])
+        }
+        return await userModel.findByIdAndDelete(id)
     }
 
     async findByIdLean(id) {
@@ -52,6 +55,9 @@ class UsersDao {
         return await userModel.findOne(data)
     }
 
+    async findLean() {
+        return await userModel.find().lean()
+    }
 }
 
 module.exports = UsersDao

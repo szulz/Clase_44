@@ -3,6 +3,27 @@ Nombre: {{user.name}} <br>
 Email: {{user.email}} <br>
 Role: {{user.role}} <br>
 ID: {{user.userID}} <br>
+{{#if user.view}}
+<h2>PREMIUM ROUTES:</h2>
+<a href="/products/create">
+    <h3>Create a product</h3>
+</a>
+<a href="/products/list">
+    <h3>Product Lists</h3>
+</a>
+
+
+{{/if}}
+
+{{#if user.admin}}
+<h2>ADMIN ROUTES:</h2>
+<a href="/products/create">
+    <h3>Create a product</h3>
+</a>
+<a href="/products/list">
+    <h3>Product Lists</h3>
+</a>
+{{/if}}
 
 <a href="/products"> Go back</a> <br>
 <button onclick="logOut()">Log Out</button> <br>

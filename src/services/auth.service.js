@@ -1,25 +1,17 @@
-const AuthDao = require("../model/DAOs/auth/auth.mongo.dao")
-const authDao = new AuthDao
-const userModel = require("../model/schemas/users.model")
-const UsersDao = require('../model/DAOs/users/users.dao.js')
-const usersDao = new UsersDao
 const { logger } = require("../utils/logger")
 const { createHash, generateCode, isValidPassword } = require("../utils/utils")
+const UsersDao = require('../model/DAOs/users/users.dao.js')
 const MailController = require("../controllers/mail.controller")
+const usersDao = new UsersDao
 const mailController = new MailController
+
+
 
 class AuthService {
     async logOut(session) {
         await usersDao.findByIdAndUpdate(session.user.userID, { last_connection: Date.now() })
         return await session.destroy()
     }
-    /*
-        async updateCode(id, code) {
-            let user = await userModel.findByIdAndUpdate(id, { recovery_code: code }, { new: true })
-            console.log(user);
-            return user
-        }
-    */
 
     async recovery(userEmail) {
         const userFound = await usersDao.findOne({ email: userEmail })
@@ -36,7 +28,7 @@ class AuthService {
     async checkCode(data) {
         let user = await usersDao.findOne({ recovery_code: { $elemMatch: { code: data } } })
         if (!user) {
-            return null
+            throw new Error('There is no user with that email, please try again with another email')
         }
         const createdAt = user.recovery_code.map(recovery_code => recovery_code.createdAt);
         async function checkTime(createdAt, user) {
@@ -46,7 +38,7 @@ class AuthService {
             if (result >= 30000) {
                 await usersDao.findByIdAndUpdate(user._id, { recovery_code: [] })
                 logger.info('el codigo expiro')
-                return null
+                throw new Error('The code has expired please go back and request another one')
             }
             return user
         }

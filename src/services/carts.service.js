@@ -1,6 +1,7 @@
-
 const CartsDao = require("../model/DAOs/carts/carts.mongo.dao.js");
 const ProductDao = require("../model/DAOs/products/products.mongo.dao.js");
+const TicketsDao = require("../model/DAOs/tickets/tickets.mongo.doa.js");
+const ticketsDao = new TicketsDao
 const cartsModel = require("../model/schemas/carts.schema.js");
 const productModel = require("../model/schemas/product.schema.js");
 const logger = require("../utils/logger.js");
@@ -8,7 +9,6 @@ const productDao = new ProductDao
 const cartsDao = new CartsDao
 
 class CartService {
-
     async createCart() {
         let newcart = await cartsDao.create()
         return newcart
@@ -18,12 +18,28 @@ class CartService {
         let cartCountent = await cartsDao.findById(id)
         if (cartCountent.cart == '') {
             let products = { empty: 'You have not added anything to the cart yet!' }
-            return products
+            console.log(products);
+            return { products }
         }
         let products = cartCountent.cart.map((cart) => {
             return { title: cart.product.title, description: cart.product.description, price: cart.product.price, stock: cart.product.stock, quantity: cart.quantity }
         })
-        return products
+        let totalAmount = []
+        let result = 0
+        let price = await products.map(product => {
+            return product.price
+        })
+        let amount = products.map(x => {
+            return x.quantity
+        })
+        for (let i = 0; i < products.length; i++) {
+            let value = price[i] * amount[i]
+            totalAmount.push(value)
+        }
+        for (let i = 0; i < totalAmount.length; i++) {
+            result += totalAmount[i]
+        }
+        return { products, result }
     }
 
     async addToCart(cartId, productId, userId) {
@@ -65,29 +81,9 @@ class CartService {
         }
     }
 
-    async getTotalAmount(products) {
-        let totalAmount = []
-        let result = 0
-        let price = await products.map(product => {
-            return product.price
-        })
-        let amount = products.map(x => {
-            return x.quantity
-        })
-        for (let i = 0; i < products.length; i++) {
-            let value = price[i] * amount[i]
-            totalAmount.push(value)
-        }
-        for (let i = 0; i < totalAmount.length; i++) {
-            result += totalAmount[i]
-        }
-        return result
-    }
-
     async returnAndClear(cartId) {
         let cartFound = await cartsDao.findById(cartId)
         if (cartFound.cart == '') {
-            console.log('EL CARRITO ESTÁ VACIO');
             return
         }
         const productOnCart = cartFound.cart.map(item => item.product._id)
@@ -105,7 +101,13 @@ class CartService {
     async emptyCart(id) {
         let cartData = await cartsDao.findById(id)
         cartData.cart = []
-        return cartData.save()
+        await cartData.save()
+        let tickets = await ticketsDao.find()
+        let purchaser = tickets.map(ticket => ticket.purchaser)
+        let actualPurchaser = purchaser.length - 1
+        let actualTicketId = tickets[actualPurchaser]._id
+        let ticket = await ticketsDao.findById(actualTicketId)
+        return ticket
     }
 }
 

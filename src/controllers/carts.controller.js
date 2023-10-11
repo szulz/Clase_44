@@ -8,11 +8,8 @@ const cartManagerMongoose = new CartManagerMongoose
 class CartsController {
 
     async userCart(req, res) {
-        const products = await cartService.userCart(req.params.cid);
-        if (products.empty) {
-            return res.render("carts", { products })
-        }
-        const result = await cartService.getTotalAmount(products)
+        let cartId = req.params.cid
+        let { products, result } = await cartService.userCart(cartId);
         return res.render("carts", { products, result })
     }
 
@@ -36,17 +33,21 @@ class CartsController {
 
     async ticketView(req, res) {
         const cartid = req.session.user.cartID
-        const products = await cartService.userCart(req.params.cid);
-        if (products.empty) {
-            return res.render("ticketsView", { products })
-        }
-        const result = await cartService.getTotalAmount(products)
+        let { products, result } = await cartService.userCart(cartid)
         return res.render("ticketsView", { products, result, cartid })
     }
 
     async generateTicket(req, res) {
         let user = req.session.user
-        await ticketService.purchase(user)
+        return await ticketService.purchase(user)
+    }
+
+    async showTicket(req, res) {
+        let cartId = req.session.user.cartID
+        let userEmail = req.user.email
+        let ticket = await cartService.emptyCart(cartId, userEmail)
+        req.logger.info(ticket);
+        res.render('checkout', ticket)
     }
 
     async returnCartStock(req, res, next) {
@@ -55,17 +56,6 @@ class CartsController {
         next()
     }
 
-    async showTicket(req, res) {
-        let cartId = req.session.user.cartID
-        await cartService.emptyCart(cartId)
-        let tickets = await ticketService.find()
-        let purchaser = tickets.map(ticket => ticket.purchaser)
-        let actualPurchaser = purchaser.length - 1
-        let actualTicketId = tickets[actualPurchaser]._id
-        let ticket = await ticketService.findTicketById(actualTicketId)
-        req.logger.info(ticket);
-        res.render('checkout', ticket)
-    }
 
 }
 

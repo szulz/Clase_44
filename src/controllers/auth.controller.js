@@ -57,13 +57,14 @@ class AuthController {
     }
 
     async passwordResetVerification(req, res) {
-        let { code } = req.body
-        let user = await authService.checkCode(code)
-        if (user == null || user == '' || null) {
-            return res.render('recoveryWrongCode')
+        try {
+            let { code } = req.body
+            let user = await authService.checkCode(code)
+            await authService.clearCode(user)
+            res.render('recoveryPassword', user)
+        } catch (error){
+            return res.send(error.message)
         }
-        await authService.clearCode(user)
-        res.render('recoveryPassword', user)
     }
 
     async passwordReset(req, res) {
