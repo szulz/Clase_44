@@ -16,23 +16,23 @@ const auth = new Auth
 
 userRouter.get('/', auth.allowAdmin, userController.getAll)
 
-userRouter.delete('/', userController.cleanInactiveUsers)
+userRouter.delete('/', auth.allowAdmin, userController.cleanInactiveUsers)
 
-userRouter.get('/admin', userController.adminViewUsers)
+userRouter.get('/admin', auth.allowAdmin, userController.adminViewUsers)
 
-userRouter.get('/admin/:uid', userController.adminUserToModify)
+userRouter.get('/admin/:uid', auth.allowAdmin, userController.adminUserToModify)
 
-userRouter.post('/admin/:uid', userController.adminUserModified)
+userRouter.post('/admin/:uid', auth.allowAdmin, userController.adminUserModified)
 
-userRouter.get('/premium/:uid', auth.allowUsersInSession, userController.userPremiumView)
+userRouter.get('/premium/:uid', userController.userPremiumView)
 
-userRouter.post('/premium/:uid', auth.allowUsersInSession, userController.becomePremium)
+userRouter.post('/premium/:uid', userController.becomePremium)
 
-userRouter.post('/premium/:uid/clear', auth.allowUsersInSession, userController.deleteDocumentsBecomeUser)
+userRouter.post('/premium/:uid/clear', userController.deleteDocumentsBecomeUser)
 
-userRouter.get('/:uid/documents', auth.allowUsersInSession, userController.uploaderView)
+userRouter.get('/:uid/documents', userController.uploaderView)
 
-userRouter.post('/:uid/documents', auth.allowUsersInSession, uploader.fields([
+userRouter.post('/:uid/documents', uploader.fields([
     { name: 'profiles', maxCount: 5 }, { name: 'products', maxCount: 5 }, { name: 'account', maxCount: 5 },
     { name: 'adress', maxCount: 5 }, { name: 'info', maxCount: 5 }]),
     userController.postDocuments)

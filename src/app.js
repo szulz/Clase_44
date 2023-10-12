@@ -16,6 +16,8 @@ const swaggerUiExpress = require('swagger-ui-express')
 const { chatRouter, connectSocket } = require('./routes/chat.router.js');
 const passport = require('passport')
 const startPassport = require('./config/passport.config.js');
+const Auth = require('./middlewares/auth.js');
+const auth = new Auth
 const { MODE, MONGO_URL, PORT, ADMIN_EMAIL, ADMIN_PASSWORD, MODE_DESCRIPTION, ADMIN_STATUS } = require('./config/env.config.js');
 logger.info(MODE_DESCRIPTION)
 
@@ -77,19 +79,15 @@ const specs = swaggerJSDoc(swaggerOptions);
 app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 //-----------------
 
-app.get('/session', (req, res) => {
-  res.send(req.session)
-})
-
-app.use('/api/sessions', sessionRouter);
-app.use('/api/users', userRouter)
-app.use('/products', productRouter);
-app.use('/carts', cartsRouter);
 app.use('/auth', authRouter)
-app.use('/profile', profileRouter)
-app.use('/mail', mailRouter)
-app.use('/sms', smsRouter)
-app.use('/chat', chatRouter)
+app.use('/api/sessions', sessionRouter);
+app.use('/api/users', auth.allowUsersInSession, userRouter)
+app.use('/products', auth.allowUsersInSession, productRouter);
+app.use('/carts', auth.allowUsersInSession, cartsRouter);
+app.use('/profile', auth.allowUsersInSession, profileRouter)
+app.use('/mail', auth.allowUsersInSession, mailRouter)
+app.use('/sms', auth.allowUsersInSession, smsRouter)
+app.use('/chat', auth.allowUsersInSession, chatRouter)
 app.use(errorHandler)
 
 const httpServer = app.listen(PORT, () => {

@@ -7,22 +7,16 @@ const CartManagerMongoose = require('../services/carts.service.js');
 const cartManagerMongoose = new CartManagerMongoose
 const cartsRouter = express.Router();
 
-//LOCALHOST8080/CARTS/ ->>>>
+cartsRouter.get('/:cid', auth.isUserCart, cartsController.userCart)
 
-//busco el carro x id
-cartsRouter.get('/:cid', auth.allowUsersInSession, auth.isUserCart, cartsController.userCart)
+cartsRouter.post('/products/:pid', auth.blockAdmin, cartsController.addProduct);
 
-//agrego prod al carro
-cartsRouter.post('/products/:pid', auth.allowUsersInSession, auth.blockAdmin, cartsController.addProduct);
+cartsRouter.delete('/:cid/products/:pid', cartsController.deleteProduct)
 
-//agregar boton para eliminar prod / decrementar la quantity
-cartsRouter.delete('/:cid/products/:pid', auth.allowUsersInSession, cartsController.deleteProduct)
+cartsRouter.get('/:cid/purchase', auth.isUserCart, cartsController.ticketView)
 
-//ticket view
-cartsRouter.get('/:cid/purchase', auth.allowUsersInSession, auth.isUserCart, cartsController.ticketView)
+cartsRouter.post('/:cid/purchase', auth.isUserCart, cartsController.generateTicket)
 
-cartsRouter.post('/:cid/purchase', auth.allowUsersInSession, auth.isUserCart, cartsController.generateTicket)
-//
-cartsRouter.get('/:cid/checkout', auth.allowUsersInSession, auth.isUserCart, cartsController.showTicket)
+cartsRouter.get('/:cid/checkout', auth.isUserCart, cartsController.showTicket)
 
 module.exports = cartsRouter

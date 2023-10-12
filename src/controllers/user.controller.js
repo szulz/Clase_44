@@ -39,8 +39,8 @@ class UserController {
                 return res.send({ message: `The role has been updated to ${newRole}` })
             }
             if (deleteUser == 1) {
-                await userDao.findByIdAndDelete(user)
-                return res.send({ message: 'The role has been removed' })
+                let removed = await userDao.findByIdAndDelete(user)
+                return res.send({ message: 'The user has been removed', data: removed })
             }
         } catch (error) {
             res.send(error.message)
