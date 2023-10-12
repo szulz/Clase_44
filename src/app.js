@@ -30,6 +30,7 @@ const MongoStore = require('connect-mongo');
 const myModules = require('./utils/utils.js')
 const path = require('path');
 const userRouter = require('./routes/users.router.js');
+const homeRouter = require('./routes/home.router.js');
 const app = express();
 app.use(addLogger)
 // --------CONNECT TO MONGO--------
@@ -79,6 +80,7 @@ const specs = swaggerJSDoc(swaggerOptions);
 app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 //-----------------
 
+app.use('/', homeRouter)
 app.use('/auth', authRouter)
 app.use('/api/sessions', sessionRouter);
 app.use('/api/users', auth.allowUsersInSession, userRouter)
