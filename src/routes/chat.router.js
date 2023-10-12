@@ -5,7 +5,7 @@ const Auth = require('../middlewares/auth')
 const auth = new Auth
 
 
-chatRouter.get('/', auth.allowUsersInSession, auth.blockAdmin, async (req, res) => {
+chatRouter.get('/', auth.blockAdmin, async (req, res) => {
     let userName = req.session.user.email
     return res.render('chat', { userName })
 })

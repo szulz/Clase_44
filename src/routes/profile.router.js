@@ -6,7 +6,7 @@ const profileRouter = express.Router()
 
 
 
-profileRouter.get('/', auth.allowUsersInSession, async (req, res) => {
+profileRouter.get('/', async (req, res) => {
     let user = req.session.user
     if (user.role === 'USER') {
         user.view = 0
@@ -15,7 +15,6 @@ profileRouter.get('/', auth.allowUsersInSession, async (req, res) => {
     } else {
         user.admin = 1
     }
-
     return res.render('profile', { user, PORT })
 })
 

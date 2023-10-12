@@ -5,8 +5,8 @@ const Auth = require('../middlewares/auth')
 const smsController = new SmsController
 const auth = new Auth
 
-smsRouter.get('/', auth.allowUsersInSession, smsController.view)
+smsRouter.get('/', smsController.view)
 
-smsRouter.post('/', auth.allowUsersInSession, smsController.send)
+smsRouter.post('/', smsController.send)
 
 module.exports = smsRouter

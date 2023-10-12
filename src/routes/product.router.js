@@ -9,20 +9,18 @@ const products_uploader = require('../middlewares/multer_products.js');
 const auth = new Auth
 
 
-productRouter.get("/", auth.allowUsersInSession, productController.showAll)
+productRouter.get("/", productController.showAll)
 
-productRouter.get('/get-one/:pid', auth.allowUsersInSession, productController.returnOne)
+productRouter.get('/get-one/:pid', productController.returnOne)
 
 productRouter.get('/list/', productController.getIds)
 
 productRouter.delete('/list/:pid/', /*auth.denieUser,*/ productController.deleteById)
 
-productRouter.get("/stock/:pid", auth.allowUsersInSession, productController.returnStock)
+productRouter.get("/stock/:pid", productController.returnStock)
 
-productRouter.get('/create', auth.denieUser, auth.allowPremiumAdmin, async (req, res) => {
-    res.render('createProduct')
-});
+productRouter.get('/create', auth.allowPremiumAdmin, async (req, res) => { res.render('createProduct') });
 
-productRouter.post('/create', auth.denieUser, auth.allowPremiumAdmin, products_uploader.single('store'), productController.createOne)
+productRouter.post('/create', auth.allowPremiumAdmin, products_uploader.single('store'), productController.createOne)
 
 module.exports = productRouter;

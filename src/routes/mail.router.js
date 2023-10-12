@@ -7,8 +7,8 @@ const mailController = new MailController
 
 
 
-mailRouter.get('/', auth.allowUsersInSession, mailController.view)
+mailRouter.get('/', mailController.view)
 
-mailRouter.post('/', auth.allowUsersInSession, mailController.sentMail)
+mailRouter.post('/', mailController.sentMail)
 
 module.exports = mailRouter;
