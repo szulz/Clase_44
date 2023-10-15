@@ -5,6 +5,8 @@ const usersDao = new UsersDao
 const fs = require('fs')
 const path = require("path")
 const { logger } = require('../utils/logger.js')
+const TicketsDao = require("../model/DAOs/tickets/tickets.mongo.doa")
+const ticketsDao = new TicketsDao
 
 class UserService {
     async cleanInactiveUsers() {
@@ -160,6 +162,23 @@ class UserService {
         }
         let deletedDocuments = await usersDao.findByIdAndUpdate(userId, { documents: [], role: 'USER' })
         return deletedDocuments
+    }
+
+    async profile(currentUser) {
+        let user = await usersDao.findByIdLean(currentUser.userID)
+        if (user.role === 'USER') {
+            user.view = 0
+        } else if (user.role === 'PREMIUM') {
+            user.view = 1
+        } else {
+            user.admin = 1
+        }
+        let tickets = await ticketsDao.findFilter({ purchaser: user.email })
+        let ticket = []
+        for (let i = 0; i < tickets.length; i++) {
+            ticket.push({ code: tickets[i].code, date: tickets[i].purchase_datetime, amount: tickets[i].amount })
+        }
+        return { user, ticket }
     }
 }
 

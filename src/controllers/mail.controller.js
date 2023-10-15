@@ -2,7 +2,7 @@ const mailService = require('../services/mail.service');
 
 class MailController {
     async view(req, res) {
-        res.render('mail', {})
+        res.status(200).render('mail', {})
     }
 
     async sentMail(req, res) {
@@ -11,7 +11,7 @@ class MailController {
         let subject = req.body.subject
         let result = await mailService.sentMail(userEmail, message, subject)
         req.logger.info(result);
-        res.render('mailSent', {})
+        res.status(200).render('mailSent', {})
     }
 
     async sentRecoveryMail(email, code) {

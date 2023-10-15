@@ -16,7 +16,11 @@ class TicketsDao {
     }
 
     async findOne(target) {
-        await ticketsModel.findOne(target)
+        return await ticketsModel.findOne(target)
+    }
+
+    async findFilter(filter) {
+        return await ticketsModel.find(filter).lean()
     }
 }
 

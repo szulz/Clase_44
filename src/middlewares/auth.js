@@ -102,9 +102,9 @@ class Auth {
             if (req.user.role == 'ADMIN') {
                 return next()
             }
-            return res.redirect('/auth/login')
+            return res.status(200).redirect('/auth/login')
         } catch {
-            return res.redirect('/auth/login')
+            return res.status(401).redirect('/auth/login')
         }
     }
 }

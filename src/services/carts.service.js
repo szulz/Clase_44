@@ -4,7 +4,7 @@ const TicketsDao = require("../model/DAOs/tickets/tickets.mongo.doa.js");
 const ticketsDao = new TicketsDao
 const cartsModel = require("../model/schemas/carts.schema.js");
 const productModel = require("../model/schemas/product.schema.js");
-const logger = require("../utils/logger.js");
+const { logger } = require("../utils/logger.js");
 const productDao = new ProductDao
 const cartsDao = new CartsDao
 
@@ -47,16 +47,14 @@ class CartService {
             let product = await productDao.findById(productId)
             let checkOwner = product.owner.find((prop) => prop.createdBy)
             if (checkOwner.createdBy.toJSON() == userId) {
+                logger.warn('You cannot add to the cart a product that you own')
                 return null
             }
             let foundCart = await cartsDao.addProduct(cartId)
             let foundProduct = await foundCart.cart.find((item) => item.product._id == productId);
             let response = await productDao.decreaseStock(productId, foundProduct, foundCart)
             if (response === null) {
-                return {
-                    status: 'not allowed',
-                    message: 'You cannot add to the cart a product that you created'
-                }
+                return { status: 'not allowed' }
             }
             return {
                 status: 'success',

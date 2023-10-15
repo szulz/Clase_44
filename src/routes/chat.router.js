@@ -7,7 +7,7 @@ const auth = new Auth
 
 chatRouter.get('/', auth.blockAdmin, async (req, res) => {
     let userName = req.session.user.email
-    return res.render('chat', { userName })
+    return res.status(200).render('chat', { userName })
 })
 
 const { Server } = require('socket.io');

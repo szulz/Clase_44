@@ -10,15 +10,15 @@ class CartsController {
     async userCart(req, res) {
         let cartId = req.params.cid
         let { products, result } = await cartService.userCart(cartId);
-        return res.render("carts", { products, result })
+        return res.status(200).render("carts", { products, result })
     }
 
     async addProduct(req, res) {
         try {
             let { status, message, payload } = await cartService.addToCart(req.session.user.cartID, req.params.pid, req.session.user.userID);
-            return res.send({ status: status, message: message, payload: payload })
+            return res.status(200).send({ status: status, message: message, payload: payload })
         } catch (e) {
-            return res.send(e.message)
+            return res.status(400).send({ status: 'Error', message: e.message })
         }
     }
 
@@ -27,14 +27,14 @@ class CartsController {
             let { message, response } = await cartService.deleteProduct(req.params.cid, req.params.pid);
             return res.status(200).send({ message: message, payload: response })
         } catch (error) {
-            res.status(400).send({ msg: error.message });
+            res.status(400).send({ status: 'Error', message: error.message });
         }
     }
 
     async ticketView(req, res) {
         const cartid = req.session.user.cartID
         let { products, result } = await cartService.userCart(cartid)
-        return res.render("ticketsView", { products, result, cartid })
+        return res.status(200).render("ticketsView", { products, result, cartid })
     }
 
     async generateTicket(req, res) {
@@ -47,7 +47,7 @@ class CartsController {
         let userEmail = req.user.email
         let ticket = await cartService.emptyCart(cartId, userEmail)
         req.logger.info(ticket);
-        res.render('checkout', ticket)
+        res.status(200).render('checkout', ticket)
     }
 
     async returnCartStock(req, res, next) {

@@ -1,8 +1,21 @@
 Tus datos ==> <br>
-Nombre: {{user.name}} <br>
+Nombre: {{user.first_name}} {{user.last_name}}<br>
 Email: {{user.email}} <br>
 Role: {{user.role}} <br>
-ID: {{user.userID}} <br>
+ID: {{user._id}} <br>
+<hr>
+{{#if ticket}}
+<h4>Purchase history:</h4>
+{{#each ticket}}
+<ul>
+    <li>Purchase code: {{this.code}}</li>
+    <li>Amount: {{this.amount}}$</li>
+    <li>Date: {{this.date}}</li>
+</ul>
+{{/each}}
+<hr>
+{{/if}}
+
 {{#if user.view}}
 <h2>PREMIUM ROUTES:</h2>
 <a href="/products/create">
@@ -11,8 +24,7 @@ ID: {{user.userID}} <br>
 <a href="/products/list">
     <h3>Product Lists</h3>
 </a>
-
-
+<hr>
 {{/if}}
 
 {{#if user.admin}}
@@ -26,10 +38,11 @@ ID: {{user.userID}} <br>
 <a href="/api/users/admin">
     <h3>Modify users</h3>
 </a>
-
+<hr>
 {{/if}}
 
 <a href="/products"> Go back</a> <br>
+
 <button onclick="logOut()">Log Out</button> <br>
 
 <script src="/js/views.js"></script>

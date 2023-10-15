@@ -36,7 +36,7 @@ class ProductController {
                 data: list,
             })
         } catch (error) {
-            res.send(error)
+            res.status(400).send({ status: 'Error', message: error.message })
         }
 
     }
@@ -56,31 +56,31 @@ class ProductController {
             let userId = req.user._id
             let productId = req.params.pid
             let { status, message } = await productService.deleteById(userId, productId)
-            return res.send({ status: status, message: message })
+            return res.status(200).send({ status: status, message: message })
         } catch (error) {
-            res.send(error.message)
+            res.status(400).send({ status: 'Error', message: error.message })
         }
     }
 
     async returnStock(req, res) {
         let product = await productDao.findById(req.params.pid)
-        return res.status(200).send({ data: product.stock });
+        return res.status(200).send({ status: 'Success', data: product.stock });
     }
 
     async showAll(req, res) {
         let cartId = await req.session.user.cartID
         let userID = await req.session.user.userID
         let { products, getAll } = await productService.showAll(req.query, req.originalUrl)
-        return res.render("products", { products, getAll, cartId, PORT, userID })
+        return res.status(200).render("products", { products, getAll, cartId, PORT, userID })
     }
 
     async returnOne(req, res) {
         try {
             let productId = req.params.pid
             let product = await productService.findById(productId);
-            return res.status(200).send({ message: 'product found', payload: product })
+            return res.status(200).send({ status: 'Success', message: 'product found', payload: product })
         } catch (error) {
-            res.send(error.message)
+            res.status(400).send({ status: 'Error', message: error.message })
         }
     }
 }

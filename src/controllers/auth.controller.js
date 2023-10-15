@@ -13,27 +13,27 @@ class AuthController {
     async logOut(req, res, next) {
         let session = req.session
         await authService.logOut(session)
-        return res.redirect('/auth/login')
+        return res.status(200).redirect('/auth/login')
     }
 
     async logInGet(req, res) {
-        return res.render('login', {})
+        return res.status(200).render('login', {})
     }
 
     async login(req, res) {
         let clearUser = new SessionDTO(await req.user)
         req.session.user = clearUser
         await usersDao.findByIdAndUpdate(clearUser.userID, { last_connection: Date.now() })
-        return res.redirect('/products')
+        return res.status(200).redirect('/products')
     }
 
     async registerGet(req, res) {
-        return res.render('register', {})
+        return res.status(200).render('register', {})
     }
 
     async register(req, res) {
         let user = req.user.first_name
-        return res.render('welcome', { user, PORT })
+        return res.status(200).render('welcome', { user, PORT })
     }
 
     authFailure(req, res) {
@@ -49,9 +49,9 @@ class AuthController {
         try {
             const email = req.body.email
             let userFound = await authService.recovery(email)
-            return res.render('recoveryEmailFound', userFound)
+            return res.status(200).render('recoveryEmailFound', userFound)
         } catch (error) {
-            res.send(error.message)
+            res.status(400).send({ status: 'Error', message: error.message })
         }
 
     }
@@ -61,9 +61,9 @@ class AuthController {
             let { code } = req.body
             let user = await authService.checkCode(code)
             await authService.clearCode(user)
-            res.render('recoveryPassword', user)
-        } catch (error){
-            return res.send(error.message)
+            res.status(200).render('recoveryPassword', user)
+        } catch (error) {
+            return res.status(400).send({ status: 'Error', message: error.message })
         }
     }
 
@@ -71,9 +71,9 @@ class AuthController {
         try {
             let { password, email } = req.body
             await authService.passwordReset(email, password)
-            res.render('recoverySuccessful')
+            res.status(200).render('recoverySuccessful')
         } catch (error) {
-            res.send(error.message)
+            res.status(400).send({ status: 'Error', message: error.message })
         }
     }
 }

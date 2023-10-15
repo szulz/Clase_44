@@ -15,7 +15,7 @@ profileRouter.get('/', async (req, res) => {
     } else {
         user.admin = 1
     }
-    return res.render('profile', { user, PORT })
+    return res.status(200).render('profile', { user, PORT })
 })
 
 module.exports = profileRouter

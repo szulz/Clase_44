@@ -17,7 +17,7 @@ class SmsController {
     }
 
     async view(req, res) {
-        res.render('sms', {})
+        res.status(200).render('sms', {})
     }
 }
 

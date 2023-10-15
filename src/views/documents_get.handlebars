@@ -1,13 +1,5 @@
-<h1>Upload Pictures and Documents</h1>
+<h1><u>Upload your Documents to become a Premium User</u></h1>
 <form action="/api/users/{{user}}/documents" method="POST" enctype="multipart/form-data">
-    <h2>Products</h2>
-    <input type="file" name="products" multiple>
-
-    <h2>Profiles</h2>
-    <input type="file" name="profiles" multiple>
-
-    <h2>Documents</h2>
-
     <h3>Indentification:</h3>
     <input type="file" name="account" multiple> <br>
     <h3>Adress:</h3>
@@ -17,3 +9,5 @@
 
     <input type="submit" value="Upload">
 </form>
+
+<a href="/products"><- Go back</a>

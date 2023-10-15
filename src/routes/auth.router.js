@@ -21,11 +21,11 @@ authRouter.post('/register', auth.denieUsersInSession, passport.authenticate('re
 
 authRouter.get('/recovery', (req, res) => { res.render('recovery') })
 
-authRouter.post('/recovery', authController.recovery)
+authRouter.post('/recovery', auth.denieUsersInSession, authController.recovery)
 
-authRouter.post('/password-reset', authController.passwordResetVerification)
+authRouter.post('/password-reset', auth.denieUsersInSession, authController.passwordResetVerification)
 
-authRouter.post('/password-new', authController.passwordReset)
+authRouter.post('/password-new', auth.denieUsersInSession, authController.passwordReset)
 
 authRouter.get('/fail', authController.authFailure)
 
