@@ -11,11 +11,11 @@ const auth = new Auth
 
 productRouter.get("/", productController.showAll)
 
-productRouter.get('/get-one/:pid', productController.returnOne)
+productRouter.get('/get-one/:pid', auth.allowPremiumAdmin, productController.returnOne)
 
-productRouter.get('/list/', productController.getIds)
+productRouter.get('/list/', auth.allowPremiumAdmin, productController.getIds)
 
-productRouter.delete('/list/:pid/', /*auth.denieUser,*/ productController.deleteById)
+productRouter.delete('/list/:pid/', auth.allowPremiumAdmin, productController.deleteById)
 
 productRouter.get("/stock/:pid", productController.returnStock)
 

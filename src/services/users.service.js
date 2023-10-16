@@ -6,6 +6,10 @@ const fs = require('fs')
 const path = require("path")
 const { logger } = require('../utils/logger.js')
 const TicketsDao = require("../model/DAOs/tickets/tickets.mongo.doa")
+const CartsDao = require("../model/DAOs/carts/carts.mongo.dao")
+const ProductDao = require("../model/DAOs/products/products.mongo.dao")
+const productDao = new ProductDao
+const cartsDao = new CartsDao
 const ticketsDao = new TicketsDao
 
 class UserService {
@@ -19,10 +23,33 @@ class UserService {
                 let timeDiference = Date.now() - lastConnection[i]
                 const hourDiference = timeDiference / (60 * 60 * 1000)
                 if (hourDiference > 48) {
-                    console.log(`se elimino el user con id ${id[i]}`);
+                    logger.info(`1 - *Removing user ${id[i]}*`);
                     let response = await usersDao.findByIdAndDelete(id, i);
-                    await mailController.deletedAccountMail(response.email)
-                    deletedUsers.push(response)
+                    if (response.role != 'USER') {
+                        logger.info('2 - *Removing users credentials*')
+                        let file = response.documents.map(x => x.reference)
+                        let folder = response.documents.map(y => y.name)
+                        let locatedFiles = path.join(__dirname, '..', '/public/documents')
+                        for (let i = 0; i < folder.length; i++) {
+                            let filePath = path.join(locatedFiles, `/${folder[i]}/${file[i]}`)
+                            fs.unlink(filePath, (err) => {
+                                if (err) {
+                                    logger.error(`Error deleting file: ${err}`);
+                                } else {
+                                    logger.info('File deleted successfully.');
+                                }
+                            })
+                        }
+                    }
+                    let deletedCart = await cartsDao.delete(id, i)
+                    logger.info(`*3 - Removing user Cart*`)
+                    let deletedTickets = await ticketsDao.deleteTickets({ purchaser: response.email })
+                    logger.info(`*4 - Removing user Tickets*`)
+                    let deletedProducts = await productDao.deleteMany({ owner: { $elemMatch: { createdBy: response._id } } })
+                    logger.info(`*5 - Removing products Created by user*`)
+                    //ENVIAR MAS LINDO EL ESQUEMA DE ARCHIVOS PARA QUE SE LEA MEJOR
+                    await mailController.deletedAccountMail(response.email, deletedProducts)
+                    deletedUsers.push({ users: response, products: deletedProducts })
                 }
             }
             if (deletedUsers.length > 0) {

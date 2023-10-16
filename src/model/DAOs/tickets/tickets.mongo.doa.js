@@ -22,6 +22,10 @@ class TicketsDao {
     async findFilter(filter) {
         return await ticketsModel.find(filter).lean()
     }
+
+    async deleteTickets(filter) {
+        return await ticketsModel.deleteMany(filter)
+    }
 }
 
 module.exports = TicketsDao

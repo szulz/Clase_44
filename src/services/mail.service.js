@@ -37,14 +37,16 @@ class MailService {
         });
     }
 
-    async deletedAccountMail(userEmail, subject) {
+    async deletedAccountMail(userEmail, subject, productsDeleted) {
         return await transport.sendMail({
             from: GOOGLE_EMAIL,
             to: userEmail,
             subject: subject,
             html: `
                 <div>
-                    <h1>Your account has been removed due to inactivity, please if you want to come back feel free to register once again!</h1>
+                    <h1>Your account along with your credentials, created products and information has been deleted due to inactivity</h1> <br>
+                    Products deleted: <br>
+                    ${productsDeleted}
                     `,
         });
     }

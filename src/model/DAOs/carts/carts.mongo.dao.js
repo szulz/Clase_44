@@ -28,6 +28,10 @@ class CartsDao {
         return targetCart
     }
 
+    async delete(id, i) {
+        return await cartsModel.findByIdAndDelete(id[i])
+    }
+
 }
 
 module.exports = CartsDao

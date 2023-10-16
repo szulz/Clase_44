@@ -21,10 +21,10 @@ class MailController {
         return await mailService.sentRecoveryMail(userEmail, message, subject)
     }
 
-    async deletedAccountMail(email) {
+    async deletedAccountMail(email, productsDeleted) {
         let userEmail = email
         let subject = 'Deleted Account'
-        return await mailService.deletedAccountMail(userEmail, subject)
+        return await mailService.deletedAccountMail(userEmail, subject, productsDeleted)
     }
 
     async deletePremiumUsersProduct(email, responsableEmail, productDeleted, responsableRole) {

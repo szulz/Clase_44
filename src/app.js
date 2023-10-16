@@ -3,7 +3,6 @@ const express = require('express');
 const { json } = require('express');
 const handlebars = require('express-handlebars')
 const productRouter = require('./routes/product.router.js')
-const profileRouter = require('./routes/profile.router.js');
 const mailRouter = require('./routes/mail.router.js');
 const sessionRouter = require('./routes/sessions.router.js');
 const cartsRouter = require('./routes/carts.router.js')
@@ -86,7 +85,6 @@ app.use('/api/sessions', sessionRouter);
 app.use('/api/users', auth.allowUsersInSession, userRouter)
 app.use('/products', auth.allowUsersInSession, productRouter);
 app.use('/carts', auth.allowUsersInSession, cartsRouter);
-app.use('/profile', auth.allowUsersInSession, profileRouter)
 app.use('/mail', auth.allowUsersInSession, mailRouter)
 app.use('/sms', auth.allowUsersInSession, smsRouter)
 app.use('/chat', auth.allowUsersInSession, chatRouter)
