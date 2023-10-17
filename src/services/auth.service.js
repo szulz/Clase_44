@@ -21,7 +21,7 @@ class AuthService {
         const { code } = generateCode();
         await usersDao.findByIdAndUpdate(userFound._id, { recovery_code: { code: code, createdAt: new Date } })
         await mailController.sentRecoveryMail(userEmail, code);
-        return userFound
+        return { userFound, code }
     }
 
 

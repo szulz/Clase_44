@@ -47,11 +47,11 @@ async function startPassport() {
                         req.logger.info(userCreated)
                         return done(null, userCreated);
                     } else {
-                        req.logger.info('user already exist');
+                        //req.logger.info('user already exist');
                         return done(null, user);
                     }
                 } catch (e) {
-                    req.logger.error('error en github');
+                    //req.logger.error('error en github');
                     return done(e)
                 }
             }
@@ -214,7 +214,7 @@ async function startPassport() {
                             await userModel.findByIdAndUpdate(userCreated._id, { role: 'admin' }, { new: true })
                         }
                     }
-                    req.logger.info(userCreated)
+                    //req.logger.info(userCreated)
                     return done(null, userCreated)
                 } catch (err) {
                     console.log(err);

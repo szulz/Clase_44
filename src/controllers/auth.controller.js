@@ -48,8 +48,8 @@ class AuthController {
     async recovery(req, res) {
         try {
             const email = req.body.email
-            let userFound = await authService.recovery(email)
-            return res.status(200).render('recoveryEmailFound', userFound)
+            let { userFound, code } = await authService.recovery(email)
+            return res.status(200).render('recoveryEmailFound', { userFound, code })
         } catch (error) {
             res.status(400).send({ status: 'Error', message: error.message })
         }
