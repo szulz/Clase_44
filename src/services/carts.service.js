@@ -17,21 +17,15 @@ class CartService {
     async userCart(id) {
         let cartCountent = await cartsDao.findById(id)
         if (cartCountent.cart == '') {
-            let products = { empty: 'You have not added anything to the cart yet!' }
-            console.log(products);
-            return { products }
+                throw new Error('You have not added anything to the cart yet!')
         }
         let products = cartCountent.cart.map((cart) => {
             return { title: cart.product.title, description: cart.product.description, price: cart.product.price, stock: cart.product.stock, quantity: cart.quantity }
         })
         let totalAmount = []
         let result = 0
-        let price = await products.map(product => {
-            return product.price
-        })
-        let amount = products.map(x => {
-            return x.quantity
-        })
+        let price = await products.map(product => { return product.price })
+        let amount = products.map(x => { return x.quantity })
         for (let i = 0; i < products.length; i++) {
             let value = price[i] * amount[i]
             totalAmount.push(value)
@@ -96,16 +90,13 @@ class CartService {
         return await cartFound.save()
     }
 
-    async emptyCart(id) {
-        let cartData = await cartsDao.findById(id)
+    async emptyCart(cartId, userEmail) {
+        let cartData = await cartsDao.findById(cartId)
         cartData.cart = []
         await cartData.save()
-        let tickets = await ticketsDao.find()
-        let purchaser = tickets.map(ticket => ticket.purchaser)
-        let actualPurchaser = purchaser.length - 1
-        let actualTicketId = tickets[actualPurchaser]._id
-        let ticket = await ticketsDao.findById(actualTicketId)
-        return ticket
+        let tickets = await ticketsDao.find({ purchaser: userEmail })
+        if (tickets.length === 0) throw new Error('You have not made any purchase')
+        return tickets.pop()
     }
 }
 

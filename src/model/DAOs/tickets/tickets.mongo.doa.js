@@ -3,7 +3,6 @@ const ticketsModel = require("../../schemas/tickets.schema")
 class TicketsDao {
     async createTicket(ticket) {
         const createdTicket = await ticketsModel.create(ticket)
-        console.log('created' + createdTicket);
         return await createdTicket.save()
     }
 
@@ -11,8 +10,9 @@ class TicketsDao {
         return await ticketsModel.findById(ticket)
     }
 
-    async find() {
-        return await ticketsModel.find()
+    async find(filter) {
+        if (!filter) return await ticketsModel.find()
+        return await ticketsModel.find(filter).lean()
     }
 
     async findOne(target) {

@@ -6,18 +6,22 @@ const cartService = new CartService
 
 class TicketService {
     async purchase(user) {
-        let user_code = Math.floor(Math.random() * 100000000)
-        let user_purchase_datetime = new Date();
-        let { result } = await cartService.userCart(user.cartID)
-        let user_purchaser = user.email
-        let ticket = {
-            code: user_code,
-            purchase_datetime: user_purchase_datetime,
-            amount: result,
-            purchaser: user_purchaser,
+        try {
+            let user_code = Math.floor(Math.random() * 100000000)
+            let user_purchase_datetime = new Date();
+            let { result } = await cartService.userCart(user.cartID)
+            let user_purchaser = user.email
+            let ticket = {
+                code: user_code,
+                purchase_datetime: user_purchase_datetime,
+                amount: result,
+                purchaser: user_purchaser,
+            }
+            let createdTicket = await ticketsDao.createTicket(ticket)
+            return await createdTicket.save()
+        } catch (error) {
+            res.status(400).send(error.message)
         }
-        let createdTicket = await ticketsDao.createTicket(ticket)
-        return await createdTicket.save()
     }
 
     async find() {

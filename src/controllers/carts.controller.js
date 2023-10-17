@@ -8,9 +8,14 @@ const cartManagerMongoose = new CartManagerMongoose
 class CartsController {
 
     async userCart(req, res) {
-        let cartId = req.params.cid
-        let { products, result } = await cartService.userCart(cartId);
-        return res.status(200).render("carts", { products, result })
+        try {
+            let cartId = req.params.cid
+            let { products, result } = await cartService.userCart(cartId);
+            return res.status(200).render("carts", { products, result })
+        } catch (e) {
+            req.logger.info(e)
+            res.status(400).render('cartsError')
+        }
     }
 
     async addProduct(req, res) {
@@ -32,9 +37,13 @@ class CartsController {
     }
 
     async ticketView(req, res) {
-        const cartid = req.session.user.cartID
-        let { products, result } = await cartService.userCart(cartid)
-        return res.status(200).render("ticketsView", { products, result, cartid })
+        try {
+            const cartid = req.session.user.cartID
+            let { products, result } = await cartService.userCart(cartid)
+            return res.status(200).render("ticketsView", { products, result, cartid })
+        } catch (e) {
+            res.status(400).send(e.message)
+        }
     }
 
     async generateTicket(req, res) {
@@ -43,11 +52,15 @@ class CartsController {
     }
 
     async showTicket(req, res) {
-        let cartId = req.session.user.cartID
-        let userEmail = req.user.email
-        let ticket = await cartService.emptyCart(cartId, userEmail)
-        req.logger.info(ticket);
-        res.status(200).render('checkout', ticket)
+        try {
+            let cartId = req.session.user.cartID
+            let userEmail = req.user.email
+            let ticket = await cartService.emptyCart(cartId, userEmail)
+            req.logger.info(ticket);
+            res.status(200).render('checkout', ticket)
+        } catch (error) {
+            res.status(400).send(error.message)
+        }
     }
 
     async returnCartStock(req, res, next) {
