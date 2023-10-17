@@ -7,6 +7,7 @@ const productService = new ProductService
 class ProductController {
     async createOne(req, res) {
         const picture_filename = req.file ? req.file.filename : null;
+        console.log(picture_filename);
         let role = req.session.user.role ? req.session.user.role : 'ADMIN'
         let user = req.session.user.userID ? req.session.user.userID : null
         let newProd = await productDao.createProduct(req.body, role, user, picture_filename);
