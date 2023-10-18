@@ -95,7 +95,7 @@ class CartService {
         cartData.cart = []
         await cartData.save()
         let tickets = await ticketsDao.find({ purchaser: userEmail })
-        if (tickets.length === 0) throw new Error('You have not made any purchase')
+        //if (tickets.length === 0) throw new Error('You have not made any purchase')
         return tickets.pop()
     }
 }

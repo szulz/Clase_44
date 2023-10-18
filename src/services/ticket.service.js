@@ -20,7 +20,7 @@ class TicketService {
             let createdTicket = await ticketsDao.createTicket(ticket)
             return await createdTicket.save()
         } catch (error) {
-            res.status(400).send(error.message)
+           throw new Error(error.message)
         }
     }
 
