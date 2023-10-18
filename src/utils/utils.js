@@ -9,7 +9,6 @@ async function connectMongo() {
         );
         //console.log('plug to mongo');
     } catch (e) {
-        console.log(e);
         throw "can not connect"
     }
 }

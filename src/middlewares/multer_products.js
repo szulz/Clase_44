@@ -1,7 +1,6 @@
 const multer = require('multer')
 const path = require('path');
 const { SERVER_URL } = require('../config/env.config');
-console.log(path.join(__dirname, 'public'));
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {

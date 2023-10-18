@@ -18,7 +18,6 @@ class CartsDao {
     async deleteById(cartId, productId) {
         let targetCart = await this.findById(cartId)
         const targetProduct = targetCart.cart.find((item) => item.product._id == productId);
-        console.log(targetProduct);
         if (targetProduct.quantity > 1) {
             targetProduct.quantity -= 1
         } else {

@@ -2,8 +2,6 @@
 const EErrors = require("../services/errors/enums");
 
 module.exports = (error, req, res, next) => {
-    console.log(error.cause);
-
     switch (error.code) {
         case EErrors.INVALID_EMAIL:
             res

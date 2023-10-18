@@ -17,7 +17,7 @@ class CartService {
     async userCart(id) {
         let cartCountent = await cartsDao.findById(id)
         if (cartCountent.cart == '') {
-                throw new Error('You have not added anything to the cart yet!')
+            throw new Error('You have not added anything to the cart yet!')
         }
         let products = cartCountent.cart.map((cart) => {
             return { title: cart.product.title, description: cart.product.description, price: cart.product.price, stock: cart.product.stock, quantity: cart.quantity }
@@ -37,29 +37,25 @@ class CartService {
     }
 
     async addToCart(cartId, productId, userId) {
-        try {
-            let product = await productDao.findById(productId)
-            let checkOwner = product.owner.find((prop) => prop.createdBy)
-            if (checkOwner.createdBy.toJSON() == userId) {
-                logger.warn('You cannot add to the cart a product that you own')
-                return null
-            }
-            let foundCart = await cartsDao.addProduct(cartId)
-            let foundProduct = await foundCart.cart.find((item) => item.product._id == productId);
-            let response = await productDao.decreaseStock(productId, foundProduct, foundCart)
-            if (response === null) {
-                return { status: 'not allowed' }
-            }
-            return {
-                status: 'success',
-                message: `A new product has been added to the cart with the id ${cartId}`,
-                payload: response
-            }
-        } catch (e) {
-            logger.error('something went wrong in addToCart')
-            throw new Error(e.message)
+        let product = await productDao.findById(productId)
+        let checkOwner = product.owner.find((prop) => prop.createdBy)
+        if (checkOwner.createdBy.toJSON() == userId) {
+            logger.warn('You cannot add to the cart a product that you own')
+            throw new Error('You cannot add to the cart a product that you own')
+        }
+        let foundCart = await cartsDao.addProduct(cartId)
+        let foundProduct = await foundCart.cart.find((item) => item.product._id == productId);
+        let response = await productDao.decreaseStock(productId, foundProduct, foundCart)
+        if (response === null) {
+            return { status: 'not allowed' }
+        }
+        return {
+            status: 'success',
+            message: `A new product has been added to the cart with the id ${cartId}`,
+            payload: response
         }
     }
+
 
     async deleteProduct(cartId, productId) {
         try {
@@ -82,7 +78,6 @@ class CartService {
         const quantitiesOnCart = cartFound.cart.map(item => item.quantity)
         for (let i = 0; productOnCart.length > i; i++) {
             let product = await productModel.findById(productOnCart[i])
-            console.log(product);
             product.stock += quantitiesOnCart[i]
             product.save()
         }

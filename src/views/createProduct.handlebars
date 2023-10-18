@@ -1,8 +1,11 @@
+<H2>PRODUCT CREATOR</H2>
 <form action="/products/create" method="POST" enctype="multipart/form-data">
-    <input type="text" name="title" placeholder="Title"><br>
-    <input type="text" name="description" placeholder="Description"><br>
-    <input type="number" name="price" placeholder="Price"><br>
-    <input type="number" name="stock" placeholder="Stock"><br>
-    <input type="file" name="store">
-    <button onclick="summit">Create</button>
+    Title: <input type="text" name="title" placeholder="Monster"><br>
+    Description: <input type="text" name="description" placeholder="Energy drink"><br>
+    Price: <input type="number" name="price" placeholder="500"><br>
+    Stock: <input type="number" name="stock" placeholder="20"><br>
+    Picture: <input type="file" name="store"> <br>
+    <button onclick="summit">Create product</button>
 </form>
+<hr>
+<a href="/api/users/profile"> <- Back to profile</a>

@@ -99,7 +99,6 @@ class UserService {
         }
         let name = user.documents.map(item => item.name)
         if (name[0] === 'account' && name[1] === 'adress' && name[2] === 'info') {
-            console.log(newRole);
             let usercatualizado = await usersDao.findByIdAndUpdate(user._id, { role: newRole })
             return usercatualizado
         } else {

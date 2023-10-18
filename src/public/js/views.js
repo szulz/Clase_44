@@ -1,4 +1,48 @@
+let prodForm = document.getElementById('prod-form')
 
+prodForm.addEventListener('submit', async function (e) {
+    e.preventDefault()
+    let product = document.getElementsByTagName('input')[0].value
+    await fetch(`/products/list/${product}/`, {
+        method: 'DELETE',
+    })
+        .then(response => response.json())
+        .then(parsedRes => {
+            if (parsedRes.status === 'Error') return window.alert(parsedRes.message)
+            let response = document.getElementsByTagName('div')[0]
+            response.innerHTML = `
+            <h2> Current product: ${product}</h2>
+            <h3>Status: ${parsedRes.message}</h3>
+            *you might want to reload the page to see the changes*
+            `
+        })
+})
+
+
+/*
+let from = document.getElementById('form-id')
+ 
+from.addEventListener('submit', async function (e) {
+    e.preventDefault()
+    let inputText = document.getElementsByTagName('input')[0].value
+    await fetch(`/products/get-one/${inputText}`, {
+        method: 'GET'
+    })
+        .then(response => response.json())
+        .then(parsedResponse => {
+            let payload = parsedResponse.payload
+            if (payload) {
+                if (payload.stock === 0) {
+                    return window.alert('No hay stock')
+                }
+            } else {
+                return window.alert('Id incorrecto')
+            }
+            let hText = document.getElementsByTagName('h1')[0];
+            hText.innerHTML = payload._id
+        })
+})
+*/
 function deleteProduct(id) {
     fetch(`/api/products/${id}`, {
         method: "DELETE",
@@ -20,7 +64,11 @@ async function addProduct(productId) {
                     fetch(`/carts/products/${productId}`, {
                         method: "POST",
                     })
-                    window.alert("Product added to the cart")
+                        .then(res => res.json())
+                        .then(parseRes => {
+                            if (parseRes.status === 'Error') return window.alert(parseRes.message)
+                            return window.alert("Product added to the cart")
+                        })
                 } else {
                     window.alert("Whops! it seems theres no more of these in stock, please refresh the page to see the actual stock")
                 }

@@ -3,3 +3,4 @@ error: this is a error logger {"timestamp":"2023-08-20T23:10:21.186Z"}
 error: Error deleting file: Error: ENOENT: no such file or directory, unlink 'C:\Users\Administrator\Clase_37\src\public\account\652d7bad2db9cf000cad9a9f_1697479647816-DELETETHIS.png'
 error: Error deleting file: Error: ENOENT: no such file or directory, unlink 'C:\Users\Administrator\Clase_37\src\public\info\652d7bad2db9cf000cad9a9f_1697479647853-DELETETHIS.png'
 error: Error deleting file: Error: ENOENT: no such file or directory, unlink 'C:\Users\Administrator\Clase_37\src\public\adress\652d7bad2db9cf000cad9a9f_1697479647839-DELETETHIS.png'
+error: something went wrong in addToCart
