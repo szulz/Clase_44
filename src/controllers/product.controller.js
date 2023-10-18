@@ -31,11 +31,13 @@ class ProductController {
     async getIds(req, res) {
         try {
             let { ids, list } = await productService.getIds()
-            return res.status(200).json({
+            list.toString;
+            return res.status(200).render('usersId', { list })
+            /*return res.status(200).json({
                 status: 'Success!',
                 amount: `Products => ${ids.length}`,
                 data: list,
-            })
+            })*/
         } catch (error) {
             res.status(400).send({ status: 'Error', message: error.message })
         }
@@ -83,6 +85,12 @@ class ProductController {
         } catch (error) {
             res.status(400).send({ status: 'Error', message: error.message })
         }
+    }
+
+    async mock(req, res) {
+        let user = req.user
+        await productService.mock(user)
+        res.send('created')
     }
 }
 

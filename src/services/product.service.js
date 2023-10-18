@@ -5,11 +5,11 @@ const { checkParams } = require("../utils/utils");
 const UsersDao = require('../model/DAOs/users/users.dao.js');
 const ProductDao = require("../model/DAOs/products/products.mongo.dao");
 const MailController = require("../controllers/mail.controller");
+const { faker } = require("@faker-js/faker");
 const mailController = new MailController
 const productDao = new ProductDao
 const usersDao = new UsersDao
-
-
+const path = require('path')
 
 class ProductService {
 
@@ -17,7 +17,7 @@ class ProductService {
         try {
             let query = await checkParams(queryParams);
             let options = {}
-            options.limit = queryParams.limit ? queryParams.limit : 10
+            options.limit = queryParams.limit ? queryParams.limit : 5
             options.page = queryParams.page ? queryParams.page : 1
             options.sort = queryParams.sort ? { price: queryParams.sort } : { createdAt: 1 };
             let res = await productModel.paginate(query, options)
@@ -91,10 +91,11 @@ class ProductService {
         let products = await productDao.find()
         let ids = products.map(x => x._id)
         let titles = products.map(y => y.title)
-        let owner = products.flatMap(z => z.owner.map(p => p.status))
+        let owner = products.flatMap(z => z.owner.map(p => { return { createdBy: p.createdBy, status: p.status } }))
         let list = []
         for (let i = 0; i < ids.length; i++) {
-            let test = `${titles[i]}=> ${owner[i]} => ${ids[i]}`
+            let user = await usersDao.findById(owner[i].createdBy)
+            let test = `${titles[i]}=> ${user.email} => ${owner[i].status} => Product ID: ${ids[i]}`
             list.push(test)
         }
         return { ids, list }
@@ -107,6 +108,20 @@ class ProductService {
             return { title: payload.title, description: payload.description, price: payload.price, stock: payload.stock, _id: JSON.stringify(payload._id), picture_filename: payload.picture_filename }
         })
         return { products, getAll }
+    }
+
+    async mock(user) {
+        let pic = 'placeholder.png'
+        for (let i = 0; i < 10; i++) {
+            let product = {
+                title: faker.commerce.product(),
+                description: faker.commerce.productDescription(),
+                price: faker.commerce.price(),
+                stock: faker.number.int({ min: 1, max: 25 })
+            }
+            await productDao.createProduct(product, user.role, user._id, pic)
+        }
+        return
     }
 };
 
