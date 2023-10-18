@@ -23,6 +23,8 @@ productRouter.get('/create', auth.allowPremiumAdmin, async (req, res) => { res.r
 
 productRouter.post('/create', auth.allowPremiumAdmin, products_uploader.single('store'), productController.createOne)
 
-productRouter.post('/mock', productController.mock)
+productRouter.get('/mock', auth.isAdmin, async (req, res) => { res.render('mock') })
+
+productRouter.post('/mock', auth.isAdmin, productController.mock)
 
 module.exports = productRouter;
