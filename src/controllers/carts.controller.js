@@ -28,8 +28,8 @@ class CartsController {
 
     async deleteProduct(req, res) {
         try {
-            let { message, response } = await cartService.deleteProduct(req.params.cid, req.params.pid);
-            return res.status(200).send({ message: message, payload: response })
+            let response = await cartService.deleteProduct(req.params.cid, req.params.pid);
+            return res.status(200).send({ message: response })
         } catch (error) {
             res.status(400).send({ status: 'Error', message: error.message });
         }

@@ -88,6 +88,8 @@ async function logOut() {
     redirectToURL(`/auth/logOut`)
 }
 
+
+
 async function goToPurchase() {
     const currentURL = window.location.href;
     const purchaseURL = currentURL + "/purchase";

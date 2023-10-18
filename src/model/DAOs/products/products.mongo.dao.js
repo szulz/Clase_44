@@ -67,6 +67,10 @@ class ProductDao {
         await productModel.deleteMany(filter);
         return products
     }
+
+    async findByIdAndUpdate(id, filter) {
+        return await productModel.findByIdAndUpdate(id, filter, { new: true })
+    }
 }
 
 module.exports = ProductDao

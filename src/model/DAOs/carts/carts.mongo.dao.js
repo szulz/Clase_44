@@ -1,4 +1,6 @@
 const cartsModel = require("../../schemas/carts.schema");
+const ProductDao = require("../products/products.mongo.dao");
+const productDao = new ProductDao
 
 class CartsDao {
     async create() {
@@ -17,12 +19,16 @@ class CartsDao {
 
     async deleteById(cartId, productId) {
         let targetCart = await this.findById(cartId)
-        const targetProduct = targetCart.cart.find((item) => item.product._id == productId);
-        if (targetProduct.quantity > 1) {
-            targetProduct.quantity -= 1
+        const productInCart = await targetCart.cart.find((item) => item.product._id == productId);
+        if (productInCart.quantity > 1) {
+            productInCart.quantity -= 1
+            targetCart.message = 'The desired product has been decreased by 1'
         } else {
-            await targetCart.cart.pull({ product: targetProduct.product._id })
+            //elimino el producto del carro
+            await targetCart.cart.pull({ product: productInCart.product._id })
+            targetCart.message = 'The desired product has been removed from your cart'
         }
+        await productDao.findByIdAndUpdate(productInCart.product._id, { $inc: { stock: 1 } })
         await targetCart.save();
         return targetCart
     }

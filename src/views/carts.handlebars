@@ -4,13 +4,17 @@
 
 {{#each products}}
 <div>
-    x{{this.quantity}} {{this.title}} <br>
-    ${{this.price}} each <br>
-    <br>
+    <ul>
+        <li> x{{this.quantity}} {{this.title}} <button onclick="deleteThis('{{this.id}}')"> - 1 </button></li>
+        <ul>
+            <li> ${{this.price}} e/a </li>
+        </ul>
+    </ul>
+
 </div>
 {{/each}}
 
-Total amount: {{result}}$ ||  <button onclick="goToPurchase()">Finish order</button> <br>
+Total amount: {{result}}$ || <button onclick="goToPurchase()">Finish order</button> <br>
 
 {{/if}}
 
@@ -18,4 +22,4 @@ Total amount: {{result}}$ ||  <button onclick="goToPurchase()">Finish order</but
 
 <a href="/products">Go back</a> <br>
 
-<script src="/js/views.js"></script>
+<script src="/js/purchase.js"></script>

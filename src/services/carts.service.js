@@ -20,7 +20,7 @@ class CartService {
             throw new Error('You have not added anything to the cart yet!')
         }
         let products = cartCountent.cart.map((cart) => {
-            return { title: cart.product.title, description: cart.product.description, price: cart.product.price, stock: cart.product.stock, quantity: cart.quantity }
+            return { title: cart.product.title, description: cart.product.description, price: cart.product.price, stock: cart.product.stock, quantity: cart.quantity, id: cart.product._id }
         })
         let totalAmount = []
         let result = 0
@@ -60,10 +60,8 @@ class CartService {
     async deleteProduct(cartId, productId) {
         try {
             let response = await cartsDao.deleteById(cartId, productId)
-            if (response) {
-                return { message: 'The desired product quantity has been decreased by 1', response }
-            };
-            return { message: 'the product has been removed from the cart successfully!' }
+            let message = response.message
+            return message
         } catch (e) {
             throw new Error(e.message)
         }
