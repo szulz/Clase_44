@@ -13,7 +13,6 @@ class CartsController {
             let { products, result } = await cartService.userCart(cartId);
             return res.status(200).render("carts", { products, result })
         } catch (e) {
-            req.logger.info(e)
             res.status(400).render('cartsError')
         }
     }

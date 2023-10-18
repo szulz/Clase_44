@@ -1,5 +1,4 @@
 let prodForm = document.getElementById('prod-form')
-
 prodForm.addEventListener('submit', async function (e) {
     e.preventDefault()
     let product = document.getElementsByTagName('input')[0].value
