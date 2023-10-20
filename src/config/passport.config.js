@@ -6,7 +6,7 @@ const GitHubStrategy = require('passport-github2')
 const FacebookStrategy = require('passport-facebook')
 const GoogleStrategy = require('passport-google-oauth2');
 const CartManagerMongoose = require('../services/carts.service.js');
-const { GITHUB_ID, GOOGLE_ID, FACEBOOK_ID, PORT, ADMIN_EMAIL, ADMIN_STATUS, URL } = require('./env.config.js');
+const { GITHUB_ID, GOOGLE_ID, FACEBOOK_ID, PORT, ADMIN_EMAIL, ADMIN_STATUS, URL, GITHUB_LOCAL_ID, GITHUB_LOCAL_clientSecret, GITHUB_LOCAL_callbackURL } = require('./env.config.js');
 const userModel = require('../model/schemas/users.model.js');
 const CustomError = require('../services/errors/custom-error.js');
 const EErrors = require('../services/errors/enums.js');
@@ -21,9 +21,9 @@ async function startPassport() {
         'github',
         new GitHubStrategy(
             {
-                clientID: GITHUB_ID,
-                clientSecret: 'db2a529ef55ff5f08af0e95f0a2836c7f4ac5de6',
-                callbackURL: `/api/sessions/githubcallback`
+                clientID: GITHUB_LOCAL_ID,
+                clientSecret: GITHUB_LOCAL_clientSecret,
+                callbackURL: GITHUB_LOCAL_callbackURL,
             },
             async (accessTocken, _, profile, done) => {
                 try {

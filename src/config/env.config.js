@@ -29,4 +29,10 @@ module.exports = {
     TWILIO_PHONE: process.env.TWILIO_PHONE,
     SERVER_URL: process.env.SERVER_URL,
     URL: process.env.URL,
+    GITHUB_LOCAL_ID: process.env.GITHUB_LOCAL_ID,
+    GITHUB_LOCAL_clientSecret: process.env.GITHUB_LOCAL_clientSecret,
+    GITHUB_LOCAL_callbackURL: process.env.GITHUB_LOCAL_callbackURL,
+    GITHUB_RENDER_ID: process.env.GITHUB_RENDER_ID,
+    GITHUB_RENDER_clientSecret: process.env.GITHUB_RENDER_clientSecret,
+    GITHUB_RENDER_callbackURL: process.env.GITHUB_RENDER_callbackURL,
 }
