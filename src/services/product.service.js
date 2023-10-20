@@ -72,7 +72,6 @@ class ProductService {
         let productsOwner = await usersDao.findById(product_createdBy)
         if (user.role == 'PREMIUM') {
             if (productCreatedBy == userId) {
-                console.log('primium borro su producto');
                 await productDao.deleteProduct(productId)
                 return { status: 'Success', message: 'Product successfully deleted!' }
             } else {
@@ -80,7 +79,6 @@ class ProductService {
             }
         }
         if (user.role == 'ADMIN') {
-            console.log('admin borro producto');
             await productDao.deleteProduct(productId)
             await mailController.deletePremiumUsersProduct(productsOwner.email, user.email, product.title, user.role)
             return { status: 'Product successfully deleted!', message: `We sent the product owner an email to notify his product being removed!` }

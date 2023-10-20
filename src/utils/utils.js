@@ -7,7 +7,6 @@ async function connectMongo() {
         await connect(
             MONGO_URL
         );
-        //console.log('plug to mongo');
     } catch (e) {
         throw "can not connect"
     }

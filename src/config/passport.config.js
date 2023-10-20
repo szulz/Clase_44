@@ -6,7 +6,7 @@ const GitHubStrategy = require('passport-github2')
 const FacebookStrategy = require('passport-facebook')
 const GoogleStrategy = require('passport-google-oauth2');
 const CartManagerMongoose = require('../services/carts.service.js');
-const { GITHUB_ID, GOOGLE_ID, FACEBOOK_ID, PORT, ADMIN_EMAIL, ADMIN_STATUS } = require('./env.config.js');
+const { GITHUB_ID, GOOGLE_ID, FACEBOOK_ID, PORT, ADMIN_EMAIL, ADMIN_STATUS, URL } = require('./env.config.js');
 const userModel = require('../model/schemas/users.model.js');
 const CustomError = require('../services/errors/custom-error.js');
 const EErrors = require('../services/errors/enums.js');
@@ -23,7 +23,7 @@ async function startPassport() {
             {
                 clientID: GITHUB_ID,
                 clientSecret: 'db2a529ef55ff5f08af0e95f0a2836c7f4ac5de6',
-                callbackURL: `http://localhost:${PORT}/api/sessions/githubcallback`
+                callbackURL: `http://localhost:8080/api/sessions/githubcallback`
             },
             async (accessTocken, _, profile, done) => {
                 try {
@@ -44,14 +44,14 @@ async function startPassport() {
                         let cartId = cart._id.toString()
                         newUser.cart = cartId
                         let userCreated = await userModel.create(newUser);
-                        req.logger.info(userCreated)
+                        //req.logger.info(userCreated)
                         return done(null, userCreated);
                     } else {
                         //req.logger.info('user already exist');
                         return done(null, user);
                     }
                 } catch (e) {
-                    //req.logger.error('error en github');
+                    console.log(e.message);
                     return done(e)
                 }
             }
@@ -164,13 +164,14 @@ async function startPassport() {
                 if (ADMIN_STATUS == 'true') {
                     if (ADMIN_EMAIL == user.email) {
                         await userModel.findByIdAndUpdate(user._id, { role: 'admin' }, { new: true })
-                        req.logger.info('se actualizo el status a admin');
+                        //req.logger.info('se actualizo el status a admin');
                     }
                 } else {
                     user.role = 'user'
                 }
                 return done(null, user)
             } catch (err) {
+                console.log(err.message);
                 return done(err)
             }
         })
@@ -196,7 +197,7 @@ async function startPassport() {
                     }
                     let existingUser = await userModel.findOne({ email: username })
                     if (existingUser) {
-                        req.logger.info('user already exists')
+                        //req.logger.info('user already exists')
                         CustomError.createError({
                             name: 'Email already Registered',
                             message: 'Please try again with another email',
